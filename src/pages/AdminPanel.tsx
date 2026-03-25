@@ -1,5 +1,5 @@
 import { useState, useEffect, FormEvent } from 'react';
-import { Plus, Trash2, Edit2, Save, X, Package, DollarSign, Tag, Layers, Maximize, Palette, Sparkles, AlertCircle, User, Mail, MessageSquare } from 'lucide-react';
+import { Plus, Trash2, Edit2, Save, X, Package, DollarSign, Tag, Layers, Maximize, Palette, Sparkles, AlertCircle, User, Mail, MessageSquare, Image, GripVertical } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { supabase } from '../lib/supabase';
 import { Product } from '../types';
@@ -21,12 +21,15 @@ export default function AdminPanel() {
     price: 0,
     category: 'articulado',
     image: 'https://picsum.photos/seed/toy/800/800',
+    images: [],
     material: 'PLA Premium',
     size: '15cm',
     colors: ['Azul', 'Vermelho', 'Verde', 'Preto', 'Branco'],
     isNew: true,
     isBestSeller: false
   });
+
+  const [newImageUrl, setNewImageUrl] = useState('');
 
   useEffect(() => {
     fetchProducts();
@@ -137,14 +140,33 @@ export default function AdminPanel() {
       price: 0,
       category: 'articulado',
       image: 'https://picsum.photos/seed/toy/800/800',
+      images: [],
       material: 'PLA Premium',
       size: '15cm',
       colors: ['Azul', 'Vermelho', 'Verde', 'Preto', 'Branco'],
       isNew: true,
       isBestSeller: false
     });
+    setNewImageUrl('');
     setEditingId(null);
     setIsAdding(false);
+  };
+
+  const addImage = () => {
+    if (newImageUrl.trim()) {
+      setFormData({
+        ...formData,
+        images: [...(formData.images || []), newImageUrl.trim()]
+      });
+      setNewImageUrl('');
+    }
+  };
+
+  const removeImage = (index: number) => {
+    setFormData({
+      ...formData,
+      images: (formData.images || []).filter((_, i) => i !== index)
+    });
   };
 
   return (
@@ -310,7 +332,7 @@ export default function AdminPanel() {
                     </div>
 
                     <div className="space-y-2">
-                      <label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">URL da Imagem</label>
+                      <label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">URL da Imagem Principal</label>
                       <div className="relative">
                         <Palette className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" size={18} />
                         <input
@@ -320,6 +342,37 @@ export default function AdminPanel() {
                           className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-white outline-none focus:border-purple-500 transition-all"
                         />
                       </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">Imagens Adicionais</label>
+                      <div className="relative">
+                        <Image className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" size={18} />
+                        <input
+                          type="text"
+                          value={newImageUrl}
+                          onChange={e => setNewImageUrl(e.target.value)}
+                          onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), addImage())}
+                          placeholder="Cole URL e pressione Enter para adicionar"
+                          className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-white outline-none focus:border-purple-500 transition-all"
+                        />
+                      </div>
+                      {formData.images && formData.images.length > 0 && (
+                        <div className="flex flex-wrap gap-2 mt-2">
+                          {formData.images.map((img, idx) => (
+                            <div key={idx} className="relative group">
+                              <img src={img} alt={`Extra ${idx + 1}`} className="w-16 h-16 rounded-lg object-cover border border-white/10" />
+                              <button
+                                type="button"
+                                onClick={() => removeImage(idx)}
+                                className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                              >
+                                <X size={12} />
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   </div>
 
