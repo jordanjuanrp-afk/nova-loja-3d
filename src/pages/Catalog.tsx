@@ -25,9 +25,14 @@ export default function Catalog({ onAddToCart }: CatalogProps) {
         const { data, error } = await supabase
           .from('products')
           .select('*')
+          .order('created_at', { ascending: false })
           ;
         
-        if (error) throw error;
+        console.log('Supabase response:', { data, error });
+        
+        if (error) {
+          console.error('Supabase error:', error);
+        }
         if (data && data.length > 0) {
           const mappedData = data.map(p => ({
             ...p,
@@ -38,7 +43,6 @@ export default function Catalog({ onAddToCart }: CatalogProps) {
         }
       } catch (error) {
         console.error('Error fetching products from Supabase:', error);
-        // Fallback to static PRODUCTS is already set in initial state
       } finally {
         setIsLoading(false);
       }

@@ -109,8 +109,8 @@ export default function AdminPanel() {
         const newProduct = {
           ...formData,
           id: Math.random().toString(36).substr(2, 9),
-          is_new: formData.isNew,
-          is_best_seller: formData.isBestSeller,
+          is_new: formData.isNew ?? true,
+          is_best_seller: formData.isBestSeller ?? false,
           name: formData.name,
           description: formData.description,
           price: formData.price,
@@ -118,10 +118,12 @@ export default function AdminPanel() {
           image: formData.image,
           material: formData.material,
           size: formData.size,
-          colors: formData.colors
+          colors: formData.colors,
+          created_at: new Date().toISOString()
         };
         delete newProduct.isNew;
         delete newProduct.isBestSeller;
+        console.log('Inserting product:', newProduct);
         const { error } = await supabase
           .from('products')
           .insert([newProduct])

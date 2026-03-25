@@ -207,9 +207,14 @@ export default function Login() {
 
           <div className="pt-6 border-t border-white/5">
             <div className="flex items-start gap-3 p-4 bg-blue-500/5 border border-blue-500/10 rounded-2xl">
-              <AlertCircle size={18} className="text-blue-400 shrink-0 mt-0.5" />
+              <Sparkles size={18} className="text-blue-400 shrink-0 mt-0.5" />
               <p className="text-[11px] text-gray-500 leading-relaxed">
-                Este painel é exclusivo para o administrador <span className="text-white font-bold">jordanjuanrp@gmail.com</span>. Se você não é o administrador, retorne à página inicial.
+                Olá! Seja muito bem-vindo(a) 😊<br/>
+                Estamos felizes em ter você aqui!<br/><br/>
+                ✔️ Complete seu cadastro com dados corretos para uma melhor experiência<br/>
+                ✔️ Explore todas as funcionalidades disponíveis na plataforma<br/>
+                ✔️ Fique atento às nossas atualizações e novidades<br/>
+                ✔️ Em caso de dúvidas, nosso suporte está sempre pronto para ajudar
               </p>
             </div>
             <button 

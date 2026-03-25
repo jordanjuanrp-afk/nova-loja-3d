@@ -22,9 +22,14 @@ export default function Home({ onAddToCart }: HomeProps) {
         const { data, error } = await supabase
           .from('products')
           .select('*')
+          .order('created_at', { ascending: false })
           ;
         
-        if (error) throw error;
+        console.log('Supabase response:', { data, error });
+        
+        if (error) {
+          console.error('Supabase error:', error);
+        }
         if (data && data.length > 0) {
           const mappedData = data.map(p => ({
             ...p,
@@ -45,6 +50,8 @@ export default function Home({ onAddToCart }: HomeProps) {
 
   const featuredProducts = products.filter(p => p.isBestSeller).slice(0, 4);
   const newProducts = products.filter(p => p.isNew).slice(0, 4);
+  const allProducts = products;
+  const displayProducts = products.length > 0 ? products : PRODUCTS;
 
   const features = [
     {
@@ -115,7 +122,32 @@ export default function Home({ onAddToCart }: HomeProps) {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            {featuredProducts.map((product) => (
+            {displayProducts.slice(0, 4).map((product) => (
+              <ProductCard 
+                key={product.id} 
+                product={product} 
+                onAddToCart={onAddToCart} 
+              />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* All Products from Database */}
+      <section className="py-32 bg-white/5">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="space-y-4 mb-16">
+            <div className="inline-flex items-center gap-2 px-3 py-1 bg-purple-500/10 border border-purple-500/20 rounded-full">
+              <Sparkles size={14} className="text-purple-400" />
+              <span className="text-[10px] font-bold text-purple-400 uppercase tracking-widest">Nossa Coleção</span>
+            </div>
+            <h2 className="text-5xl font-black text-white tracking-tighter">
+              Todos os <span className="text-purple-400">Produtos</span>
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            {displayProducts.map((product) => (
               <ProductCard 
                 key={product.id} 
                 product={product} 
@@ -167,7 +199,7 @@ export default function Home({ onAddToCart }: HomeProps) {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            {newProducts.map((product) => (
+            {displayProducts.slice(4, 8).map((product) => (
               <ProductCard 
                 key={product.id} 
                 product={product} 
@@ -175,24 +207,6 @@ export default function Home({ onAddToCart }: HomeProps) {
               />
             ))}
           </div>
-        </div>
-      </section>
-
-      {/* Newsletter */}
-      <section className="py-20 bg-white/5 border-t border-white/5">
-        <div className="max-w-3xl mx-auto px-4 text-center space-y-8">
-          <h2 className="text-4xl font-black text-white tracking-tighter">Fique por dentro das novidades!</h2>
-          <p className="text-gray-400">Receba ofertas exclusivas, cupons de desconto e saiba primeiro sobre nossos novos modelos 3D.</p>
-          <form className="flex flex-col sm:flex-row gap-4">
-            <input 
-              type="email" 
-              placeholder="Seu melhor e-mail" 
-              className="flex-1 bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white focus:border-blue-500 outline-none transition-all"
-            />
-            <button className="px-10 py-4 bg-blue-600 text-white font-bold rounded-2xl hover:bg-blue-500 transition-all shadow-lg shadow-blue-600/20">
-              Inscrever-se
-            </button>
-          </form>
         </div>
       </section>
     </div>
