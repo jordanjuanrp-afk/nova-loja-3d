@@ -27,7 +27,7 @@ export default function ProductDetail({ onAddToCart }: ProductDetailProps) {
           .select('*')
           .eq('id', id)
           .single()
-          .schema('public');
+          ;
         
         if (error) throw error;
         if (data) {

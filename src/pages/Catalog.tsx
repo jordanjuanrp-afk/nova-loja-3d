@@ -25,7 +25,7 @@ export default function Catalog({ onAddToCart }: CatalogProps) {
         const { data, error } = await supabase
           .from('products')
           .select('*')
-          .schema('public');
+          ;
         
         if (error) throw error;
         if (data && data.length > 0) {
