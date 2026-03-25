@@ -31,8 +31,13 @@ export default function ProductDetail({ onAddToCart }: ProductDetailProps) {
         
         if (error) throw error;
         if (data) {
-          setProduct(data);
-          setSelectedColor(data.colors[0]);
+          const mappedData = {
+            ...data,
+            isNew: data.is_new,
+            isBestSeller: data.is_best_seller
+          };
+          setProduct(mappedData);
+          setSelectedColor(mappedData.colors[0]);
         }
       } catch (error) {
         console.error('Error fetching product from Supabase:', error);

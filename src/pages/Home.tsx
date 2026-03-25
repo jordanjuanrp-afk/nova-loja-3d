@@ -26,7 +26,12 @@ export default function Home({ onAddToCart }: HomeProps) {
         
         if (error) throw error;
         if (data && data.length > 0) {
-          setProducts(data);
+          const mappedData = data.map(p => ({
+            ...p,
+            isNew: p.is_new,
+            isBestSeller: p.is_best_seller
+          }));
+          setProducts(mappedData);
         }
       } catch (error) {
         console.error('Error fetching products from Supabase:', error);

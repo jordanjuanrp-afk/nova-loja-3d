@@ -61,7 +61,12 @@ export default function AdminPanel() {
       
       if (error) throw error;
       if (data && data.length > 0) {
-        setProducts(data);
+        const mappedData = data.map(p => ({
+          ...p,
+          isNew: p.is_new,
+          isBestSeller: p.is_best_seller
+        }));
+        setProducts(mappedData);
       } else {
         setProducts(PRODUCTS);
       }
@@ -79,9 +84,22 @@ export default function AdminPanel() {
 
     try {
       if (editingId) {
+        const updateData = {
+          name: formData.name,
+          description: formData.description,
+          price: formData.price,
+          category: formData.category,
+          image: formData.image,
+          images: formData.images,
+          material: formData.material,
+          size: formData.size,
+          colors: formData.colors,
+          is_new: formData.isNew,
+          is_best_seller: formData.isBestSeller
+        };
         const { error } = await supabase
           .from('products')
-          .update(formData)
+          .update(updateData)
           .eq('id', editingId)
           ;
         
@@ -90,8 +108,20 @@ export default function AdminPanel() {
       } else {
         const newProduct = {
           ...formData,
-          id: Math.random().toString(36).substr(2, 9)
+          id: Math.random().toString(36).substr(2, 9),
+          is_new: formData.isNew,
+          is_best_seller: formData.isBestSeller,
+          name: formData.name,
+          description: formData.description,
+          price: formData.price,
+          category: formData.category,
+          image: formData.image,
+          material: formData.material,
+          size: formData.size,
+          colors: formData.colors
         };
+        delete newProduct.isNew;
+        delete newProduct.isBestSeller;
         const { error } = await supabase
           .from('products')
           .insert([newProduct])
