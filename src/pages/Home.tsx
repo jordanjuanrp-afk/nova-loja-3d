@@ -21,7 +21,8 @@ export default function Home({ onAddToCart }: HomeProps) {
       try {
         const { data, error } = await supabase
           .from('products')
-          .select('*');
+          .select('*')
+          .schema('public');
         
         if (error) throw error;
         if (data && data.length > 0) {

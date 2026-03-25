@@ -41,7 +41,8 @@ export default function AdminPanel() {
       const { data, error } = await supabase
         .from('custom_requests')
         .select('*')
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false })
+        .schema('public');
       
       if (error && error.code !== '42P01') throw error;
       if (data) setSuggestions(data);
@@ -55,7 +56,8 @@ export default function AdminPanel() {
     try {
       const { data, error } = await supabase
         .from('products')
-        .select('*');
+        .select('*')
+        .schema('public');
       
       if (error) throw error;
       if (data && data.length > 0) {
@@ -80,7 +82,8 @@ export default function AdminPanel() {
         const { error } = await supabase
           .from('products')
           .update(formData)
-          .eq('id', editingId);
+          .eq('id', editingId)
+          .schema('public');
         
         if (error) throw error;
         toast.success('Produto atualizado com sucesso!');
@@ -91,7 +94,8 @@ export default function AdminPanel() {
         };
         const { error } = await supabase
           .from('products')
-          .insert([newProduct]);
+          .insert([newProduct])
+          .schema('public');
         
         if (error) throw error;
         toast.success('Produto criado com sucesso!');
@@ -115,7 +119,8 @@ export default function AdminPanel() {
       const { error } = await supabase
         .from('products')
         .delete()
-        .eq('id', id);
+        .eq('id', id)
+        .schema('public');
       
       if (error) throw error;
       toast.success('Produto excluído com sucesso!');

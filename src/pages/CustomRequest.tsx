@@ -32,7 +32,8 @@ export default function CustomRequest() {
             toy_type: formData.toyType,
             created_at: new Date().toISOString()
           }
-        ]);
+        ])
+        .schema('public');
 
       if (error && error.code !== '42P01') { // 42P01 is "relation does not exist"
         throw error;
