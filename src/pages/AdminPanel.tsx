@@ -1,5 +1,5 @@
 import { useState, useEffect, FormEvent } from 'react';
-import { Plus, Trash2, Edit2, Save, X, Package, DollarSign, Tag, Layers, Maximize, Palette, Sparkles, AlertCircle, User, Mail, MessageSquare, Image, GripVertical } from 'lucide-react';
+import { Plus, Trash2, Edit2, Save, X, Package, DollarSign, Tag, Layers, Maximize, Palette, Sparkles, AlertCircle, User, Mail, MessageSquare, Image, GripVertical, ShoppingCart, Bell } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { supabase } from '../lib/supabase';
 import { Product } from '../types';
@@ -8,9 +8,10 @@ import { PRODUCTS } from '../constants';
 import { cn } from '../lib/utils';
 
 export default function AdminPanel() {
-  const [activeTab, setActiveTab] = useState<'products' | 'suggestions'>('products');
+  const [activeTab, setActiveTab] = useState<'products' | 'suggestions' | 'orders'>('products');
   const [products, setProducts] = useState<Product[]>([]);
   const [suggestions, setSuggestions] = useState<any[]>([]);
+  const [orders, setOrders] = useState<any[]>([]);
   const [isAdding, setIsAdding] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -34,6 +35,22 @@ export default function AdminPanel() {
   useEffect(() => {
     fetchProducts();
     fetchSuggestions();
+    fetchOrders();
+
+    const channel = supabase
+      .channel('orders-changes')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'orders' }, (payload) => {
+        console.log('New order:', payload);
+        fetchOrders();
+        toast.success('Novo pedido recebido!', {
+          description: `Pedido #${payload.new.order_number}`
+        });
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   async function fetchSuggestions() {
@@ -48,6 +65,20 @@ export default function AdminPanel() {
       if (data) setSuggestions(data);
     } catch (error) {
       console.error('Error fetching suggestions:', error);
+    }
+  }
+
+  async function fetchOrders() {
+    try {
+      const { data, error } = await supabase
+        .from('orders')
+        .select('*')
+        .order('created_at', { ascending: false });
+      
+      if (error) throw error;
+      if (data) setOrders(data);
+    } catch (error) {
+      console.error('Error fetching orders:', error);
     }
   }
 
@@ -242,6 +273,19 @@ export default function AdminPanel() {
                 )}
               >
                 Sugestões
+              </button>
+              <button
+                onClick={() => setActiveTab('orders')}
+                className={cn(
+                  "px-6 py-3 rounded-xl text-sm font-bold transition-all flex items-center gap-2",
+                  activeTab === 'orders' ? "bg-white text-black shadow-lg" : "text-gray-400 hover:text-white"
+                )}
+              >
+                <Bell size={16} />
+                Pedidos
+                {orders.length > 0 && (
+                  <span className="bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">{orders.length}</span>
+                )}
               </button>
             </div>
 
@@ -559,6 +603,61 @@ export default function AdminPanel() {
                 </div>
                 <h3 className="text-xl font-black text-white">Nenhuma sugestão ainda</h3>
                 <p className="text-gray-500">As sugestões dos usuários aparecerão aqui.</p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Orders List */}
+        {activeTab === 'orders' && (
+          <div className="grid grid-cols-1 gap-4">
+            {orders.length > 0 ? (
+              orders.map((order) => (
+                <div key={order.id} className="bg-zinc-900 border border-white/10 rounded-[32px] p-8 space-y-4 hover:border-green-500/30 transition-all">
+                  <div className="flex flex-col md:flex-row justify-between gap-4">
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 bg-green-500/10 rounded-2xl flex items-center justify-center text-green-400">
+                        <ShoppingCart size={24} />
+                      </div>
+                      <div>
+                        <h3 className="text-xl font-black text-white">Pedido #{order.order_number || order.id}</h3>
+                        <div className="flex items-center gap-2 text-gray-500 text-sm">
+                          <span>{new Date(order.created_at).toLocaleString('pt-BR')}</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest ${
+                        order.status === 'pending' ? 'bg-yellow-500/20 text-yellow-400' :
+                        order.status === 'paid' ? 'bg-green-500/20 text-green-400' :
+                        'bg-gray-500/20 text-gray-400'
+                      }`}>
+                        {order.status === 'pending' ? 'Pendente' : order.status === 'paid' ? 'Pago' : order.status}
+                      </span>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-white/5 rounded-2xl p-4 space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-400">Valor Total:</span>
+                      <span className="text-white font-bold">R$ {order.total}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-400">Forma de Pagamento:</span>
+                      <span className="text-white font-bold">
+                        {order.payment_method === 'pix' ? 'PIX' : order.payment_method === 'credit' ? 'Cartão de Crédito' : order.payment_method}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="py-20 text-center space-y-4">
+                <div className="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center mx-auto text-gray-600">
+                  <ShoppingCart size={32} />
+                </div>
+                <h3 className="text-xl font-black text-white">Nenhum pedido ainda</h3>
+                <p className="text-gray-500">Os pedidos dos clientes aparecerão aqui.</p>
               </div>
             )}
           </div>
