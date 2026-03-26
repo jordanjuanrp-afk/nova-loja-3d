@@ -148,7 +148,7 @@ export default function CartDrawer({
                 <button
                   onClick={() => {
                     onClose();
-                    navigate('/checkout');
+                    setTimeout(() => navigate('/checkout', { replace: true }), 100);
                   }}
                   className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold py-4 rounded-2xl flex items-center justify-center gap-2 hover:from-blue-500 hover:to-purple-500 transition-all shadow-lg shadow-blue-500/20 group"
                 >
