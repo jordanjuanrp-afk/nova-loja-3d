@@ -57,14 +57,7 @@ export default function Payment({ items, customerData, user, onSuccess }: Paymen
             order_number: orderNumber,
             total: subtotal,
             payment_method: selectedPayment,
-            status: 'pending',
-            items: JSON.stringify(items.map(item => ({
-              product_id: item.id,
-              name: item.name,
-              quantity: item.quantity,
-              price: item.price,
-              color: item.selectedColor
-            })))
+            status: 'pending'
           }
         ]);
 
