@@ -54,21 +54,17 @@ export default function Payment({ items, customerData, user, onSuccess }: Paymen
         .from('orders')
         .insert([
           {
-            user_id: user.id,
             order_number: orderNumber,
             total: subtotal,
             payment_method: selectedPayment,
             status: 'pending',
-            customer_name: customerData.name,
-            customer_email: customerData.email,
-            shipping_address: `${customerData.address}, ${customerData.complement}, ${customerData.city} - ${customerData.state}, ${customerData.cep}`,
-            items: items.map(item => ({
+            items: JSON.stringify(items.map(item => ({
               product_id: item.id,
               name: item.name,
               quantity: item.quantity,
               price: item.price,
               color: item.selectedColor
-            }))
+            })))
           }
         ]);
 
