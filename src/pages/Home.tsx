@@ -22,8 +22,7 @@ export default function Home({ onAddToCart }: HomeProps) {
         const { data, error } = await supabase
           .from('products')
           .select('*')
-          .order('created_at', { ascending: false })
-          ;
+          .order('created_at', { ascending: false });
         
         console.log('Supabase response:', { data, error });
         
@@ -45,7 +44,11 @@ export default function Home({ onAddToCart }: HomeProps) {
       }
     }
 
-    fetchProducts();
+    if (supabase) {
+      fetchProducts();
+    } else {
+      setIsLoading(false);
+    }
   }, []);
 
   const featuredProducts = products.filter(p => p.isBestSeller).slice(0, 4);
@@ -73,7 +76,7 @@ export default function Home({ onAddToCart }: HomeProps) {
 
   return (
     <div className="min-h-screen bg-black">
-      <Hero />
+      <Hero products={displayProducts} />
 
       {/* Features Section */}
       <section className="py-20 bg-white/5 border-y border-white/5">

@@ -1,8 +1,15 @@
 import { motion } from 'motion/react';
 import { ArrowRight, Box, Zap, Shield, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { Product } from '../types';
 
-export default function Hero() {
+interface HeroProps {
+  products: Product[];
+}
+
+export default function Hero({ products }: HeroProps) {
+  const displayProduct = products && products.length > 0 ? products[0] : null;
+
   return (
     <section className="relative pt-32 pb-20 overflow-hidden">
       {/* Background Elements */}
@@ -95,15 +102,15 @@ export default function Hero() {
               {/* Main Image Placeholder */}
               <div className="relative w-full h-full rounded-3xl overflow-hidden border border-white/10 shadow-2xl">
                 <img 
-                  src="https://picsum.photos/seed/3dtoy/1000/1000" 
-                  alt="3D Toy Showcase" 
+                  src={displayProduct?.image || "https://picsum.photos/seed/3dtoy/1000/1000"} 
+                  alt={displayProduct?.name || "3D Toy Showcase"} 
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                   referrerPolicy="no-referrer"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                 <div className="absolute bottom-6 left-6 right-6">
-                  <div className="text-white font-bold text-xl mb-1">Dragão de Cristal Articulado</div>
-                  <div className="text-blue-400 font-medium text-sm">O mais vendido da semana</div>
+                  <div className="text-white font-bold text-xl mb-1">{displayProduct?.name || "Dragão de Cristal Articulado"}</div>
+                  <div className="text-blue-400 font-medium text-sm">{displayProduct ? `${displayProduct.price}` : "O mais vendido da semana"}</div>
                 </div>
               </div>
             </div>
