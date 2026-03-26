@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'motion/react';
-import { CreditCard, Smartphone, Check, ArrowLeft, MessageCircle, Copy, CheckCircle } from 'lucide-react';
+import { CreditCard, Smartphone, Check, ArrowLeft, MessageCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { formatCurrency } from '../lib/utils';
 import { CartItem } from '../types';
@@ -31,8 +31,7 @@ export default function Payment({ items, customerData, user, onSuccess }: Paymen
   const [selectedInstallments, setSelectedInstallments] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [orderComplete, setOrderComplete] = useState(false);
-  const [orderNumber, setOrderNumber] = useState('');
-  const [copied, setCopied] = useState(false);
+  const accessKey = '069973a1-a54b-47e1-9507-ec6f326a4ef0';
 
   const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
@@ -51,13 +50,11 @@ export default function Payment({ items, customerData, user, onSuccess }: Paymen
     setIsLoading(true);
 
     try {
-      const newOrderNumber = `ORD-${Date.now()}`;
-      
       const { error: orderError } = await supabase
         .from('orders')
         .insert([
           {
-            order_number: newOrderNumber,
+            order_number: accessKey,
             total: subtotal,
             payment_method: selectedPayment,
             status: 'pending'
@@ -66,7 +63,6 @@ export default function Payment({ items, customerData, user, onSuccess }: Paymen
 
       if (orderError) throw orderError;
 
-      setOrderNumber(newOrderNumber);
       setOrderComplete(true);
       onSuccess();
     } catch (error: any) {
@@ -77,15 +73,9 @@ export default function Payment({ items, customerData, user, onSuccess }: Paymen
     }
   };
 
-  const copyOrderId = () => {
-    navigator.clipboard.writeText(orderNumber);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
-
   const getWhatsAppLink = () => {
     const phoneNumber = '5521999999999'; // Substitua pelo número da loja
-    const message = `📢 *Aviso Importante*\n\nPara concluir seu pedido, peça que finalize a compra e, em seguida, você será automaticamente redirecionado para o nosso atendimento no WhatsApp 📲.\n\nPor lá, confirmaremos os detalhes do seu pedido e daremos continuidade ao seu atendimento de forma rápida e segura.\n\nAgradecemos pela preferência! 😊\n\n*ID do Pedido:* ${orderNumber}\n*Valor:* ${formatCurrency(subtotal)}`;
+    const message = `📢 *Aviso Importante*\n\nPara concluir seu pedido, peça que finalize a compra e, em seguida, você será automaticamente redirecionado para o nosso atendimento no WhatsApp 📲.\n\nPor lá, confirmaremos os detalhes do seu pedido e daremos continuidade ao seu atendimento de forma rápida e segura.\n\nAgradecemos pela preferência! 😊\n\n*Chave de Acesso:* 069973a1-a54b-47e1-9507-ec6f326a4ef0\n*Valor:* ${formatCurrency(subtotal)}`;
     return `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
   };
 
@@ -109,12 +99,9 @@ export default function Payment({ items, customerData, user, onSuccess }: Paymen
 
             {/* Order ID */}
             <div className="bg-white/5 rounded-2xl p-4 mb-6">
-              <p className="text-sm text-gray-400 mb-2">ID do Pedido</p>
+              <p className="text-sm text-gray-400 mb-2">Chave de Acesso</p>
               <div className="flex items-center justify-between bg-black/40 rounded-xl p-3">
-                <span className="text-white font-mono font-bold text-lg">{orderNumber}</span>
-                <button onClick={copyOrderId} className="text-gray-400 hover:text-white transition-colors">
-                  {copied ? <CheckCircle size={20} className="text-green-500" /> : <Copy size={20} />}
-                </button>
+                <span className="text-white font-mono font-bold text-lg">069973a1-a54b-47e1-9507-ec6f326a4ef0</span>
               </div>
             </div>
 
