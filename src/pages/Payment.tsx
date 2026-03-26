@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'motion/react';
-import { CreditCard, Smartphone, Check, Receipt, ArrowLeft } from 'lucide-react';
+import { CreditCard, Smartphone, Check, ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { formatCurrency } from '../lib/utils';
 import { CartItem } from '../types';
@@ -23,7 +23,7 @@ interface PaymentProps {
   onSuccess: () => void;
 }
 
-type PaymentMethod = 'pix' | 'credit' | 'boleto';
+type PaymentMethod = 'pix' | 'credit';
 
 export default function Payment({ items, customerData, user, onSuccess }: PaymentProps) {
   const navigate = useNavigate();
@@ -76,8 +76,7 @@ export default function Payment({ items, customerData, user, onSuccess }: Paymen
 
       const paymentNames: Record<string, string> = {
         pix: 'PIX',
-        credit: 'Cartão de Crédito',
-        boleto: 'Boleto'
+        credit: 'Cartão de Crédito'
       };
 
       toast.success('Pedido realizado com sucesso!', {
@@ -182,26 +181,6 @@ export default function Payment({ items, customerData, user, onSuccess }: Paymen
               </div>
             </div>
             {selectedPayment === 'credit' && <Check className="text-blue-400" size={28} />}
-          </button>
-
-          <button
-            onClick={() => setSelectedPayment('boleto')}
-            className={`w-full p-6 rounded-2xl border-2 flex items-center justify-between transition-all ${
-              selectedPayment === 'boleto' 
-                ? 'border-yellow-500 bg-yellow-500/10' 
-                : 'border-white/10 bg-white/5 hover:border-yellow-500/50'
-            }`}
-          >
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-yellow-500/20 rounded-xl">
-                <Receipt className="text-yellow-400" size={28} />
-              </div>
-              <div className="text-left">
-                <p className="text-white font-bold text-lg">Boleto</p>
-                <p className="text-sm text-gray-400">Vencimento em 3 dias úteis</p>
-              </div>
-            </div>
-            {selectedPayment === 'boleto' && <Check className="text-yellow-400" size={28} />}
           </button>
 
           {selectedPayment === 'credit' && (
