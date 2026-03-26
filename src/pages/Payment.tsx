@@ -6,7 +6,6 @@ import { formatCurrency } from '../lib/utils';
 import { CartItem } from '../types';
 import { supabase } from '../lib/supabase';
 import { toast } from 'sonner';
-import { QRCodeSVG } from 'qrcode.react';
 
 interface PaymentProps {
   items: CartItem[];
@@ -92,8 +91,6 @@ export default function Payment({ items, customerData, user, onSuccess }: Paymen
 
   // Página de sucesso
   if (orderComplete) {
-    const pixKey = 'seudominio@pix.com'; // Substitua pela chave PIX real
-    
     return (
       <div className="min-h-screen pt-32 pb-20 bg-black">
         <div className="max-w-2xl mx-auto px-4">
@@ -126,13 +123,12 @@ export default function Payment({ items, customerData, user, onSuccess }: Paymen
               <div className="text-center mb-6">
                 <p className="text-sm text-gray-400 mb-4">Escaneie o QR Code para pagar</p>
                 <div className="inline-block bg-white p-4 rounded-2xl">
-                  <QRCodeSVG
-                    value={`${pixKey}|${orderNumber}|${subtotal}`}
-                    size={200}
-                    level="H"
+                  <img 
+                    src="/qrcode-pix.png" 
+                    alt="QR Code PIX" 
+                    className="w-48 h-48"
                   />
                 </div>
-                <p className="text-xs text-gray-500 mt-4">Chave PIX: {pixKey}</p>
               </div>
             )}
 
