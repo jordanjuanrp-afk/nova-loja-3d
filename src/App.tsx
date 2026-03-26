@@ -11,6 +11,8 @@ import AdminPanel from './pages/AdminPanel';
 import About from './pages/About';
 import CustomRequest from './pages/CustomRequest';
 import Login from './pages/Login';
+import Checkout from './pages/Checkout';
+import Payment from './pages/Payment';
 import { Product, CartItem, User } from './types';
 import { supabase } from './lib/supabase';
 
@@ -18,6 +20,16 @@ export default function App() {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [user, setUser] = useState<User | null>(null);
+  const [customerData, setCustomerData] = useState<{
+    name: string;
+    email: string;
+    phone: string;
+    address: string;
+    city: string;
+    state: string;
+    cep: string;
+    complement: string;
+  } | null>(null);
 
   // Load cart from localStorage
   useEffect(() => {
@@ -113,11 +125,21 @@ export default function App() {
       toast.error('Por favor, faça login para finalizar a compra.');
       return;
     }
-    toast.success('Pedido realizado com sucesso!', {
-      description: 'Em breve você receberá um e-mail com os detalhes do envio.'
-    });
+  };
+
+  const handleProceedToPayment = (data: typeof customerData) => {
+    if (!user) {
+      toast.error('Por favor, faça login para finalizar a compra.');
+      return;
+    }
+    setCustomerData(data);
+  };
+
+  const handlePaymentSuccess = () => {
     setCartItems([]);
     setIsCartOpen(false);
+    localStorage.removeItem('toyverse_cart');
+    setCustomerData(null);
   };
 
   return (
@@ -139,6 +161,22 @@ export default function App() {
             <Route path="/personalizados" element={<CustomRequest />} />
             <Route path="/sobre" element={<About />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/checkout" element={
+              <Checkout 
+                items={cartItems} 
+                onUpdateQuantity={handleUpdateQuantity} 
+                onRemoveItem={handleRemoveItem}
+                onProceedToPayment={handleProceedToPayment}
+              />
+            } />
+            <Route path="/payment" element={
+              <Payment 
+                items={cartItems}
+                customerData={customerData}
+                user={user ? { id: user.id, name: user.name, email: user.email } : null}
+                onSuccess={handlePaymentSuccess}
+              />
+            } />
             <Route path="/contato" element={<div className="pt-32 text-center h-screen">Contato em breve...</div>} />
             {user?.role === 'admin' && (
               <Route path="/admin" element={<AdminPanel />} />

@@ -1,5 +1,6 @@
 import { X, ShoppingBag, Trash2, Plus, Minus, ArrowRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import { useNavigate } from 'react-router-dom';
 import { CartItem } from '../types';
 import { formatCurrency } from '../lib/utils';
 
@@ -20,6 +21,7 @@ export default function CartDrawer({
   onRemoveItem,
   onCheckout,
 }: CartDrawerProps) {
+  const navigate = useNavigate();
   const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
   return (
@@ -144,7 +146,10 @@ export default function CartDrawer({
                 </div>
                 
                 <button
-                  onClick={onCheckout}
+                  onClick={() => {
+                    onClose();
+                    navigate('/checkout');
+                  }}
                   className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold py-4 rounded-2xl flex items-center justify-center gap-2 hover:from-blue-500 hover:to-purple-500 transition-all shadow-lg shadow-blue-500/20 group"
                 >
                   Finalizar Compra
