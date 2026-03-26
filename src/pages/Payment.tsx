@@ -86,7 +86,7 @@ export default function Payment({ items, customerData, user, onSuccess }: Paymen
 
   const getWhatsAppLink = () => {
     const phoneNumber = '5521999999999'; // Substitua pelo número da loja
-    const message = `Olá! Acabei de fazer o pedido *${orderNumber}* no valor de ${formatCurrency(subtotal)}. Segue o comprovante.`;
+    const message = `📢 *Aviso Importante*\n\nPara concluir seu pedido, peça que finalize a compra e, em seguida, você será automaticamente redirecionado para o nosso atendimento no WhatsApp 📲.\n\nPor lá, confirmaremos os detalhes do seu pedido e daremos continuidade ao seu atendimento de forma rápida e segura.\n\nAgradecemos pela preferência! 😊\n\n*ID do Pedido:* ${orderNumber}\n*Valor:* ${formatCurrency(subtotal)}`;
     return `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
   };
 
