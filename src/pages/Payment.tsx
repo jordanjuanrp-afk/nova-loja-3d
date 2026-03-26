@@ -74,7 +74,7 @@ export default function Payment({ items, customerData, user, onSuccess }: Paymen
   };
 
   const getWhatsAppLink = () => {
-    const phoneNumber = '5521999999999'; // Substitua pelo número da loja
+    const phoneNumber = '5541987122246';
     const message = `📢 *Aviso Importante*\n\nPara concluir seu pedido, peça que finalize a compra e, em seguida, você será automaticamente redirecionado para o nosso atendimento no WhatsApp 📲.\n\nPor lá, confirmaremos os detalhes do seu pedido e daremos continuidade ao seu atendimento de forma rápida e segura.\n\nAgradecemos pela preferência! 😊\n\n*Chave de Acesso:* 069973a1-a54b-47e1-9507-ec6f326a4ef0\n*Valor:* ${formatCurrency(subtotal)}`;
     return `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
   };

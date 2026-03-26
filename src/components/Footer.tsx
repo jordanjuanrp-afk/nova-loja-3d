@@ -66,15 +66,15 @@ export default function Footer() {
             <ul className="space-y-4">
               <li className="flex items-start gap-3 text-gray-500">
                 <MapPin size={20} className="text-blue-500 flex-shrink-0" />
-                <span>Av. da Inovação, 3D - São Paulo, SP</span>
+                <span>Av. da Inovação, 3D - CURITIBA, PR</span>
               </li>
               <li className="flex items-center gap-3 text-gray-500">
                 <Phone size={20} className="text-purple-500 flex-shrink-0" />
-                <span>(11) 99999-8888</span>
+                <span>(41) 98712-2246</span>
               </li>
               <li className="flex items-center gap-3 text-gray-500">
                 <Mail size={20} className="text-orange-500 flex-shrink-0" />
-                <span>contato@toyverse3d.com</span>
+                <span>junincarvalhos22@gmail.com</span>
               </li>
             </ul>
           </div>
