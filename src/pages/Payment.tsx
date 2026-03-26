@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { motion } from 'motion/react';
-import { CreditCard, Smartphone, Check, ArrowLeft } from 'lucide-react';
+import { CreditCard, Smartphone, Check, ArrowLeft, MessageCircle, Copy, CheckCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { formatCurrency } from '../lib/utils';
 import { CartItem } from '../types';
 import { supabase } from '../lib/supabase';
 import { toast } from 'sonner';
+import { QRCodeSVG } from 'qrcode.react';
 
 interface PaymentProps {
   items: CartItem[];
@@ -30,6 +31,9 @@ export default function Payment({ items, customerData, user, onSuccess }: Paymen
   const [selectedPayment, setSelectedPayment] = useState<PaymentMethod | null>(null);
   const [selectedInstallments, setSelectedInstallments] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
+  const [orderComplete, setOrderComplete] = useState(false);
+  const [orderNumber, setOrderNumber] = useState('');
+  const [copied, setCopied] = useState(false);
 
   const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
@@ -48,13 +52,13 @@ export default function Payment({ items, customerData, user, onSuccess }: Paymen
     setIsLoading(true);
 
     try {
-      const orderNumber = `ORD-${Date.now()}`;
+      const newOrderNumber = `ORD-${Date.now()}`;
       
       const { error: orderError } = await supabase
         .from('orders')
         .insert([
           {
-            order_number: orderNumber,
+            order_number: newOrderNumber,
             total: subtotal,
             payment_method: selectedPayment,
             status: 'pending'
@@ -63,17 +67,9 @@ export default function Payment({ items, customerData, user, onSuccess }: Paymen
 
       if (orderError) throw orderError;
 
-      const paymentNames: Record<string, string> = {
-        pix: 'PIX',
-        credit: 'Cartão de Crédito'
-      };
-
-      toast.success('Pedido realizado com sucesso!', {
-        description: `Pedido ${orderNumber} - Pagamento via ${paymentNames[selectedPayment]}`
-      });
-
+      setOrderNumber(newOrderNumber);
+      setOrderComplete(true);
       onSuccess();
-      navigate('/');
     } catch (error: any) {
       console.error('Payment error:', error);
       toast.error('Erro ao processar pagamento: ' + error.message);
@@ -81,6 +77,94 @@ export default function Payment({ items, customerData, user, onSuccess }: Paymen
       setIsLoading(false);
     }
   };
+
+  const copyOrderId = () => {
+    navigator.clipboard.writeText(orderNumber);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const getWhatsAppLink = () => {
+    const phoneNumber = '5521999999999'; // Substitua pelo número da loja
+    const message = `Olá! Acabei de fazer o pedido *${orderNumber}* no valor de ${formatCurrency(subtotal)}. Segue o comprovante.`;
+    return `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+  };
+
+  // Página de sucesso
+  if (orderComplete) {
+    const pixKey = 'seudominio@pix.com'; // Substitua pela chave PIX real
+    
+    return (
+      <div className="min-h-screen pt-32 pb-20 bg-black">
+        <div className="max-w-2xl mx-auto px-4">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-zinc-900 border border-white/10 rounded-3xl p-8"
+          >
+            <div className="text-center mb-8">
+              <div className="w-20 h-20 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Check className="text-green-500" size={40} />
+              </div>
+              <h1 className="text-3xl font-black text-white mb-2">Pedido Realizado!</h1>
+              <p className="text-gray-400">Agora realize o pagamento para confirmar seu pedido</p>
+            </div>
+
+            {/* Order ID */}
+            <div className="bg-white/5 rounded-2xl p-4 mb-6">
+              <p className="text-sm text-gray-400 mb-2">ID do Pedido</p>
+              <div className="flex items-center justify-between bg-black/40 rounded-xl p-3">
+                <span className="text-white font-mono font-bold text-lg">{orderNumber}</span>
+                <button onClick={copyOrderId} className="text-gray-400 hover:text-white transition-colors">
+                  {copied ? <CheckCircle size={20} className="text-green-500" /> : <Copy size={20} />}
+                </button>
+              </div>
+            </div>
+
+            {/* QR Code for PIX */}
+            {selectedPayment === 'pix' && (
+              <div className="text-center mb-6">
+                <p className="text-sm text-gray-400 mb-4">Escaneie o QR Code para pagar</p>
+                <div className="inline-block bg-white p-4 rounded-2xl">
+                  <QRCodeSVG
+                    value={`${pixKey}|${orderNumber}|${subtotal}`}
+                    size={200}
+                    level="H"
+                  />
+                </div>
+                <p className="text-xs text-gray-500 mt-4">Chave PIX: {pixKey}</p>
+              </div>
+            )}
+
+            {/* WhatsApp Button */}
+            <a
+              href={getWhatsAppLink()}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full py-4 bg-green-500 hover:bg-green-600 text-white font-bold rounded-2xl flex items-center justify-center gap-3 transition-colors"
+            >
+              <MessageCircle size={24} />
+              Enviar Comprovante via WhatsApp
+            </a>
+
+            <p className="text-center text-xs text-gray-500 mt-6">
+              Após o pagamento, envie o comprovante pelo WhatsApp
+            </p>
+
+            <button
+              onClick={() => {
+                setOrderComplete(false);
+                navigate('/');
+              }}
+              className="w-full mt-4 py-3 text-gray-400 hover:text-white transition-colors text-sm"
+            >
+              Voltar para Home
+            </button>
+          </motion.div>
+        </div>
+      </div>
+    );
+  }
 
   if (items.length === 0) {
     return (
