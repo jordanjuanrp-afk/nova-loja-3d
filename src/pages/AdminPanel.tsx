@@ -87,7 +87,7 @@ export default function AdminPanel() {
     try {
       const { error } = await supabase
         .from('orders')
-        .update({ status: 'confirmed', updated_at: new Date().toISOString() })
+        .update({ status: 'confirmed' })
         .eq('id', orderId);
       
       if (error) throw error;
@@ -106,7 +106,7 @@ export default function AdminPanel() {
     try {
       const { error } = await supabase
         .from('orders')
-        .update({ status: 'rejected', updated_at: new Date().toISOString() })
+        .update({ status: 'rejected' })
         .eq('id', orderId);
       
       if (error) throw error;
@@ -125,7 +125,7 @@ export default function AdminPanel() {
     try {
       const { error } = await supabase
         .from('orders')
-        .update({ status: 'paid', updated_at: new Date().toISOString() })
+        .update({ status: 'paid' })
         .eq('id', orderId);
       
       if (error) throw error;
