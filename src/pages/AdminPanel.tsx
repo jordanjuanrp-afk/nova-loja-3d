@@ -159,8 +159,7 @@ export default function AdminPanel() {
         const mappedData = data.map(p => ({
           ...p,
           isNew: p.is_new,
-          isBestSeller: p.is_best_seller,
-          videoUrl: p.video_url
+          isBestSeller: p.is_best_seller
         }));
         setProducts(mappedData);
       } else {
@@ -187,7 +186,6 @@ export default function AdminPanel() {
           category: formData.category,
           image: formData.image,
           images: formData.images,
-          video_url: formData.videoUrl || '',
           material: formData.material,
           size: formData.size,
           colors: formData.colors,

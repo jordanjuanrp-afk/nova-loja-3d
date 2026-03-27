@@ -38,8 +38,7 @@ export default function ProductDetail({ onAddToCart }: ProductDetailProps) {
           const mappedData = {
             ...data,
             isNew: data.is_new,
-            isBestSeller: data.is_best_seller,
-            videoUrl: data.video_url
+            isBestSeller: data.is_best_seller
           };
           setProduct(mappedData);
           setSelectedColor(mappedData.colors[0]);
