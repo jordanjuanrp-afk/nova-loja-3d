@@ -1,9 +1,10 @@
-import { ShoppingCart, Eye, Heart, Star } from 'lucide-react';
+import { ShoppingCart, Eye, Heart, Star, ZoomIn } from 'lucide-react';
 import { motion } from 'motion/react';
 import { Product } from '../types';
 import { formatCurrency, cn } from '../lib/utils';
 import { Link } from 'react-router-dom';
-import React from 'react';
+import React, { useState } from 'react';
+import ImageLightbox from './ImageLightbox';
 
 interface ProductCardProps {
   product: Product;
@@ -11,6 +12,8 @@ interface ProductCardProps {
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart }) => {
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+
   return (
     <motion.div
       whileHover={{ y: -8 }}
@@ -44,7 +47,10 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart }) => {
       </div>
 
       {/* Image */}
-      <div className="relative aspect-square overflow-hidden bg-white/5">
+      <div 
+        className="relative aspect-square overflow-hidden bg-white/5 cursor-zoom-in"
+        onClick={(e) => { e.preventDefault(); e.stopPropagation(); setLightboxOpen(true); }}
+      >
         <img
           src={product.image}
           alt={product.name}
@@ -52,6 +58,9 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart }) => {
           referrerPolicy="no-referrer"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+        <div className="absolute bottom-4 right-4 p-2 bg-black/60 backdrop-blur-md rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
+          <ZoomIn size={16} className="text-white" />
+        </div>
         
         {/* Quick Add Button */}
         <button
@@ -88,6 +97,14 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart }) => {
           </span>
         </div>
       </div>
+
+      <ImageLightbox
+        images={[product.image]}
+        currentIndex={0}
+        isOpen={lightboxOpen}
+        onClose={() => setLightboxOpen(false)}
+        productName={product.name}
+      />
     </motion.div>
   );
 };

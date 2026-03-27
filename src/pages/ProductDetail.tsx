@@ -1,11 +1,12 @@
 import { useParams, Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
-import { ShoppingCart, Heart, Share2, Star, Shield, Zap, Box, ArrowLeft, Check } from 'lucide-react';
+import { ShoppingCart, Heart, Share2, Star, Shield, Zap, Box, Check, ZoomIn } from 'lucide-react';
 import { PRODUCTS } from '../constants';
 import { Product, CartItem } from '../types';
 import { formatCurrency, cn } from '../lib/utils';
 import { supabase } from '../lib/supabase';
+import ImageLightbox from '../components/ImageLightbox';
 
 interface ProductDetailProps {
   onAddToCart: (product: Product, quantity: number, color: string) => void;
@@ -18,6 +19,9 @@ export default function ProductDetail({ onAddToCart }: ProductDetailProps) {
   const [quantity, setQuantity] = useState(1);
   const [activeTab, setActiveTab] = useState<'desc' | 'spec' | 'eval'>('desc');
   const [isLoading, setIsLoading] = useState(true);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [lightboxIndex, setLightboxIndex] = useState(0);
+  const [mainImageIndex, setMainImageIndex] = useState(0);
 
   useEffect(() => {
     async function fetchProduct() {
@@ -82,7 +86,8 @@ export default function ProductDetail({ onAddToCart }: ProductDetailProps) {
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="relative aspect-square rounded-[40px] overflow-hidden bg-white/5 border border-white/10 group shadow-2xl"
+              className="relative aspect-square rounded-[40px] overflow-hidden bg-white/5 border border-white/10 group shadow-2xl cursor-zoom-in"
+              onClick={() => { setLightboxIndex(mainImageIndex); setLightboxOpen(true); }}
             >
               <img
                 src={product.image}
@@ -94,12 +99,22 @@ export default function ProductDetail({ onAddToCart }: ProductDetailProps) {
                 {product.isNew && <span className="px-4 py-1.5 bg-blue-500 text-white text-[10px] font-black uppercase tracking-widest rounded-full shadow-lg shadow-blue-500/20">Novo</span>}
                 {product.isBestSeller && <span className="px-4 py-1.5 bg-orange-500 text-white text-[10px] font-black uppercase tracking-widest rounded-full shadow-lg shadow-orange-500/20">Destaque</span>}
               </div>
+              <div className="absolute bottom-6 right-6 p-3 bg-black/60 backdrop-blur-md rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
+                <ZoomIn size={20} className="text-white" />
+              </div>
             </motion.div>
 
             {/* Thumbnail Gallery (Mock) */}
             <div className="grid grid-cols-4 gap-4">
               {[...Array(4)].map((_, i) => (
-                <div key={i} className="aspect-square rounded-2xl bg-white/5 border border-white/10 overflow-hidden cursor-pointer hover:border-blue-500 transition-all">
+                <div 
+                  key={i} 
+                  className={cn(
+                    "aspect-square rounded-2xl bg-white/5 border overflow-hidden cursor-pointer transition-all",
+                    mainImageIndex === i ? "border-blue-500" : "border-white/10 hover:border-blue-500"
+                  )}
+                  onClick={() => setMainImageIndex(i)}
+                >
                   <img src={product.image} alt="" className="w-full h-full object-cover opacity-50 hover:opacity-100 transition-opacity" referrerPolicy="no-referrer" />
                 </div>
               ))}
@@ -304,6 +319,14 @@ export default function ProductDetail({ onAddToCart }: ProductDetailProps) {
           </div>
         </div>
       </div>
+
+      <ImageLightbox
+        images={[product.image]}
+        currentIndex={0}
+        isOpen={lightboxOpen}
+        onClose={() => setLightboxOpen(false)}
+        productName={product.name}
+      />
     </div>
   );
 }
