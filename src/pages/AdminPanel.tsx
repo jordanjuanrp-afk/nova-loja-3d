@@ -103,8 +103,6 @@ export default function AdminPanel() {
   };
 
   const handleRejectOrder = async (orderId: string) => {
-    if (!confirm('Tem certeza que deseja excluir este pedido? Esta ação não pode ser desfeita.')) return;
-    
     try {
       const { error } = await supabase
         .from('orders')
@@ -113,11 +111,9 @@ export default function AdminPanel() {
       
       if (error) throw error;
       
-      toast.success('Pedido removido', {
-        description: 'O pedido foi excluído permanentemente.'
-      });
+      setOrders(orders.filter(order => order.id !== orderId));
       
-      fetchOrders();
+      toast.success('Pedido removido!');
     } catch (error: any) {
       toast.error('Erro ao remover pedido: ' + error.message);
     }
@@ -684,14 +680,12 @@ export default function AdminPanel() {
                 const isPending = order.status === 'pending';
                 const isConfirmed = order.status === 'confirmed';
                 const isPaid = order.status === 'paid';
-                const isRejected = order.status === 'rejected';
                 
                 return (
                   <div 
                     key={order.id} 
                     className={cn(
                       "bg-zinc-900 border rounded-[32px] p-8 space-y-4 transition-all",
-                      isRejected ? "border-red-500/30 bg-red-500/5" :
                       isConfirmed ? "border-blue-500/30" :
                       isPaid ? "border-green-500/30" :
                       "border-white/10 hover:border-yellow-500/30"
@@ -701,13 +695,11 @@ export default function AdminPanel() {
                       <div className="flex items-center gap-4">
                         <div className={cn(
                           "w-12 h-12 rounded-2xl flex items-center justify-center",
-                          isRejected ? "bg-red-500/10 text-red-400" :
                           isConfirmed ? "bg-blue-500/10 text-blue-400" :
                           isPaid ? "bg-green-500/10 text-green-400" :
                           "bg-yellow-500/10 text-yellow-400"
                         )}>
-                          {isRejected ? <XCircle size={24} /> :
-                           isConfirmed ? <Clock size={24} /> :
+                          {isConfirmed ? <Clock size={24} /> :
                            isPaid ? <CheckCircle size={24} /> :
                            <ShoppingCart size={24} />}
                         </div>
@@ -724,13 +716,11 @@ export default function AdminPanel() {
                           isPending ? 'bg-yellow-500/20 text-yellow-400' :
                           isConfirmed ? 'bg-blue-500/20 text-blue-400' :
                           isPaid ? 'bg-green-500/20 text-green-400' :
-                          isRejected ? 'bg-red-500/20 text-red-400' :
                           'bg-gray-500/20 text-gray-400'
                         }`}>
                           {isPending ? 'Pendente' :
                            isConfirmed ? 'Confirmado' :
                            isPaid ? 'Pago' :
-                           isRejected ? 'Recusado' :
                            order.status}
                         </span>
                         <button
@@ -834,15 +824,6 @@ export default function AdminPanel() {
                         <div className="flex items-center gap-2 text-green-400 font-bold">
                           <CheckCircle size={20} />
                           Pagamento confirmado - Pedido em produção
-                        </div>
-                      </div>
-                    )}
-
-                    {isRejected && (
-                      <div className="pt-4 border-t border-red-500/20">
-                        <div className="flex items-center gap-2 text-red-400 font-bold">
-                          <XCircle size={20} />
-                          Pedido recusado
                         </div>
                       </div>
                     )}
