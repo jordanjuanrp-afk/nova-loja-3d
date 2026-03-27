@@ -159,7 +159,9 @@ export default function AdminPanel() {
         const mappedData = data.map(p => ({
           ...p,
           isNew: p.is_new,
-          isBestSeller: p.is_best_seller
+          isBestSeller: p.is_best_seller,
+          videoUrl: p.video_url,
+          images: p.images
         }));
         setProducts(mappedData);
       } else {
@@ -186,6 +188,7 @@ export default function AdminPanel() {
           category: formData.category,
           image: formData.image,
           images: formData.images,
+          video_url: formData.videoUrl || null,
           material: formData.material,
           size: formData.size,
           colors: formData.colors,
@@ -202,25 +205,21 @@ export default function AdminPanel() {
         toast.success('Produto atualizado com sucesso!');
       } else {
         const newProduct = {
-          ...formData,
           id: Math.random().toString(36).substr(2, 9),
+          name: formData.name!,
+          description: formData.description!,
+          price: formData.price!,
+          category: formData.category!,
+          image: formData.image!,
+          images: formData.images || [],
+          video_url: formData.videoUrl || null,
+          material: formData.material!,
+          size: formData.size!,
+          colors: formData.colors!,
           is_new: formData.isNew ?? true,
           is_best_seller: formData.isBestSeller ?? false,
-          name: formData.name,
-          description: formData.description,
-          price: formData.price,
-          category: formData.category,
-          image: formData.image,
-          material: formData.material,
-          size: formData.size,
-          colors: formData.colors,
           created_at: new Date().toISOString()
         };
-        delete newProduct.isNew;
-        delete newProduct.isBestSeller;
-        delete newProduct.videoUrl;
-        delete newProduct.images;
-        console.log('Inserting product:', newProduct);
         const { error } = await supabase
           .from('products')
           .insert([newProduct])
