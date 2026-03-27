@@ -1,5 +1,5 @@
 import { useState, useEffect, FormEvent } from 'react';
-import { Plus, Trash2, Edit2, Save, X, Package, DollarSign, Tag, Layers, Maximize, Palette, Sparkles, AlertCircle, User, Mail, MessageSquare, Image, GripVertical, ShoppingCart, Bell } from 'lucide-react';
+import { Plus, Trash2, Edit2, Save, X, Package, DollarSign, Tag, Layers, Maximize, Palette, Sparkles, AlertCircle, User, Mail, MessageSquare, Image, GripVertical, ShoppingCart, Bell, Check, XCircle, Clock, CheckCircle, ChevronDown, ChevronUp } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { supabase } from '../lib/supabase';
 import { Product } from '../types';
@@ -15,6 +15,7 @@ export default function AdminPanel() {
   const [isAdding, setIsAdding] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [expandedOrders, setExpandedOrders] = useState<Set<string>>(new Set());
   
   const [formData, setFormData] = useState<Partial<Product>>({
     name: '',
@@ -81,6 +82,72 @@ export default function AdminPanel() {
       console.error('Error fetching orders:', error);
     }
   }
+
+  const handleConfirmOrder = async (orderId: string) => {
+    try {
+      const { error } = await supabase
+        .from('orders')
+        .update({ status: 'confirmed', updated_at: new Date().toISOString() })
+        .eq('id', orderId);
+      
+      if (error) throw error;
+      
+      toast.success('Pedido confirmado!', {
+        description: 'O cliente será notificado.'
+      });
+      
+      fetchOrders();
+    } catch (error: any) {
+      toast.error('Erro ao confirmar pedido: ' + error.message);
+    }
+  };
+
+  const handleRejectOrder = async (orderId: string) => {
+    const reason = prompt('Motivo da recusa (opcional):');
+    
+    try {
+      const { error } = await supabase
+        .from('orders')
+        .update({ status: 'rejected', rejection_reason: reason || 'Sem motivo informado', updated_at: new Date().toISOString() })
+        .eq('id', orderId);
+      
+      if (error) throw error;
+      
+      toast.success('Pedido recusado', {
+        description: reason ? `Motivo: ${reason}` : 'O cliente será notificado.'
+      });
+      
+      fetchOrders();
+    } catch (error: any) {
+      toast.error('Erro ao recusar pedido: ' + error.message);
+    }
+  };
+
+  const handleMarkAsPaid = async (orderId: string) => {
+    try {
+      const { error } = await supabase
+        .from('orders')
+        .update({ status: 'paid', updated_at: new Date().toISOString() })
+        .eq('id', orderId);
+      
+      if (error) throw error;
+      
+      toast.success('Pedido marcado como Pago!');
+      fetchOrders();
+    } catch (error: any) {
+      toast.error('Erro ao atualizar pedido: ' + error.message);
+    }
+  };
+
+  const toggleOrderExpand = (orderId: string) => {
+    const newExpanded = new Set(expandedOrders);
+    if (newExpanded.has(orderId)) {
+      newExpanded.delete(orderId);
+    } else {
+      newExpanded.add(orderId);
+    }
+    setExpandedOrders(newExpanded);
+  };
 
   async function fetchProducts() {
     setIsLoading(true);
@@ -612,45 +679,181 @@ export default function AdminPanel() {
         {activeTab === 'orders' && (
           <div className="grid grid-cols-1 gap-4">
             {orders.length > 0 ? (
-              orders.map((order) => (
-                <div key={order.id} className="bg-zinc-900 border border-white/10 rounded-[32px] p-8 space-y-4 hover:border-green-500/30 transition-all">
-                  <div className="flex flex-col md:flex-row justify-between gap-4">
-                    <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 bg-green-500/10 rounded-2xl flex items-center justify-center text-green-400">
-                        <ShoppingCart size={24} />
-                      </div>
-                      <div>
-                        <h3 className="text-xl font-black text-white">Pedido #{order.order_number || order.id}</h3>
-                        <div className="flex items-center gap-2 text-gray-500 text-sm">
-                          <span>{new Date(order.created_at).toLocaleString('pt-BR')}</span>
+              orders.map((order) => {
+                const isExpanded = expandedOrders.has(order.id);
+                const isPending = order.status === 'pending';
+                const isConfirmed = order.status === 'confirmed';
+                const isPaid = order.status === 'paid';
+                const isRejected = order.status === 'rejected';
+                
+                return (
+                  <div 
+                    key={order.id} 
+                    className={cn(
+                      "bg-zinc-900 border rounded-[32px] p-8 space-y-4 transition-all",
+                      isRejected ? "border-red-500/30 bg-red-500/5" :
+                      isConfirmed ? "border-blue-500/30" :
+                      isPaid ? "border-green-500/30" :
+                      "border-white/10 hover:border-yellow-500/30"
+                    )}
+                  >
+                    <div className="flex flex-col md:flex-row justify-between gap-4">
+                      <div className="flex items-center gap-4">
+                        <div className={cn(
+                          "w-12 h-12 rounded-2xl flex items-center justify-center",
+                          isRejected ? "bg-red-500/10 text-red-400" :
+                          isConfirmed ? "bg-blue-500/10 text-blue-400" :
+                          isPaid ? "bg-green-500/10 text-green-400" :
+                          "bg-yellow-500/10 text-yellow-400"
+                        )}>
+                          {isRejected ? <XCircle size={24} /> :
+                           isConfirmed ? <Clock size={24} /> :
+                           isPaid ? <CheckCircle size={24} /> :
+                           <ShoppingCart size={24} />}
+                        </div>
+                        <div>
+                          <h3 className="text-xl font-black text-white">Pedido #{order.order_number || order.id}</h3>
+                          <div className="flex items-center gap-2 text-gray-500 text-sm">
+                            <Clock size={14} />
+                            <span>{new Date(order.created_at).toLocaleString('pt-BR')}</span>
+                          </div>
                         </div>
                       </div>
+                      <div className="flex items-center gap-3">
+                        <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest ${
+                          isPending ? 'bg-yellow-500/20 text-yellow-400' :
+                          isConfirmed ? 'bg-blue-500/20 text-blue-400' :
+                          isPaid ? 'bg-green-500/20 text-green-400' :
+                          isRejected ? 'bg-red-500/20 text-red-400' :
+                          'bg-gray-500/20 text-gray-400'
+                        }`}>
+                          {isPending ? 'Pendente' :
+                           isConfirmed ? 'Confirmado' :
+                           isPaid ? 'Pago' :
+                           isRejected ? 'Recusado' :
+                           order.status}
+                        </span>
+                        <button
+                          onClick={() => toggleOrderExpand(order.id)}
+                          className="p-2 bg-white/5 rounded-xl hover:bg-white/10 transition-colors"
+                        >
+                          {isExpanded ? <ChevronUp size={20} className="text-gray-400" /> : <ChevronDown size={20} className="text-gray-400" />}
+                        </button>
+                      </div>
                     </div>
-                    <div className="text-right">
-                      <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest ${
-                        order.status === 'pending' ? 'bg-yellow-500/20 text-yellow-400' :
-                        order.status === 'paid' ? 'bg-green-500/20 text-green-400' :
-                        'bg-gray-500/20 text-gray-400'
-                      }`}>
-                        {order.status === 'pending' ? 'Pendente' : order.status === 'paid' ? 'Pago' : order.status}
-                      </span>
+                    
+                    <div className="bg-white/5 rounded-2xl p-4 space-y-2">
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-400">Valor Total:</span>
+                        <span className="text-white font-bold">R$ {order.total}</span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-400">Forma de Pagamento:</span>
+                        <span className="text-white font-bold">
+                          {order.payment_method === 'pix' ? 'PIX' : order.payment_method === 'credit' ? 'Cartão de Crédito' : order.payment_method}
+                        </span>
+                      </div>
+                      {order.customer_name && (
+                        <div className="flex justify-between text-sm">
+                          <span className="text-gray-400">Cliente:</span>
+                          <span className="text-white font-bold">{order.customer_name}</span>
+                        </div>
+                      )}
+                      {order.customer_email && (
+                        <div className="flex justify-between text-sm">
+                          <span className="text-gray-400">Email:</span>
+                          <span className="text-white font-bold">{order.customer_email}</span>
+                        </div>
+                      )}
+                      {order.rejection_reason && (
+                        <div className="flex justify-between text-sm">
+                          <span className="text-red-400">Motivo da Recusa:</span>
+                          <span className="text-red-300 font-bold">{order.rejection_reason}</span>
+                        </div>
+                      )}
                     </div>
+
+                    {/* Expanded Details */}
+                    {isExpanded && order.items && (
+                      <div className="bg-black/20 rounded-2xl p-4 space-y-3">
+                        <h4 className="text-sm font-bold text-gray-400 uppercase tracking-widest">Itens do Pedido</h4>
+                        {(typeof order.items === 'string' ? JSON.parse(order.items) : order.items || []).map((item: any, idx: number) => (
+                          <div key={idx} className="flex items-center gap-4 p-3 bg-white/5 rounded-xl">
+                            {item.image && (
+                              <img src={item.image} alt={item.name} className="w-12 h-12 rounded-lg object-cover" />
+                            )}
+                            <div className="flex-1">
+                              <div className="text-white font-bold">{item.name}</div>
+                              {item.color && <div className="text-gray-500 text-xs">Cor: {item.color}</div>}
+                            </div>
+                            <div className="text-right">
+                              <div className="text-white font-bold">R$ {item.price}</div>
+                              <div className="text-gray-500 text-xs">Qty: {item.quantity || 1}</div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Action Buttons */}
+                    {isPending && (
+                      <div className="flex flex-wrap gap-3 pt-4 border-t border-white/5">
+                        <button
+                          onClick={() => handleConfirmOrder(order.id)}
+                          className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-green-600 hover:bg-green-500 text-white font-bold rounded-xl transition-all"
+                        >
+                          <Check size={18} />
+                          Confirmar Pedido
+                        </button>
+                        <button
+                          onClick={() => handleRejectOrder(order.id)}
+                          className="flex items-center justify-center gap-2 px-6 py-3 bg-red-600/80 hover:bg-red-600 text-white font-bold rounded-xl transition-all"
+                        >
+                          <XCircle size={18} />
+                          Recusar
+                        </button>
+                      </div>
+                    )}
+
+                    {isConfirmed && (
+                      <div className="flex gap-3 pt-4 border-t border-white/5">
+                        <button
+                          onClick={() => handleMarkAsPaid(order.id)}
+                          className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-green-600 hover:bg-green-500 text-white font-bold rounded-xl transition-all"
+                        >
+                          <CheckCircle size={18} />
+                          Marcar como Pago
+                        </button>
+                        <button
+                          onClick={() => handleRejectOrder(order.id)}
+                          className="flex items-center justify-center gap-2 px-6 py-3 bg-red-600/80 hover:bg-red-600 text-white font-bold rounded-xl transition-all"
+                        >
+                          <XCircle size={18} />
+                          Cancelar
+                        </button>
+                      </div>
+                    )}
+
+                    {isPaid && (
+                      <div className="pt-4 border-t border-green-500/20">
+                        <div className="flex items-center gap-2 text-green-400 font-bold">
+                          <CheckCircle size={20} />
+                          Pagamento confirmado - Pedido em produção
+                        </div>
+                      </div>
+                    )}
+
+                    {isRejected && (
+                      <div className="pt-4 border-t border-red-500/20">
+                        <div className="flex items-center gap-2 text-red-400 font-bold">
+                          <XCircle size={20} />
+                          Pedido recusado
+                        </div>
+                      </div>
+                    )}
                   </div>
-                  
-                  <div className="bg-white/5 rounded-2xl p-4 space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-400">Valor Total:</span>
-                      <span className="text-white font-bold">R$ {order.total}</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-400">Forma de Pagamento:</span>
-                      <span className="text-white font-bold">
-                        {order.payment_method === 'pix' ? 'PIX' : order.payment_method === 'credit' ? 'Cartão de Crédito' : order.payment_method}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              ))
+                );
+              })
             ) : (
               <div className="py-20 text-center space-y-4">
                 <div className="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center mx-auto text-gray-600">
