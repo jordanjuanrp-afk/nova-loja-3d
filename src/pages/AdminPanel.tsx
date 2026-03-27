@@ -218,6 +218,8 @@ export default function AdminPanel() {
         };
         delete newProduct.isNew;
         delete newProduct.isBestSeller;
+        delete newProduct.videoUrl;
+        delete newProduct.images;
         console.log('Inserting product:', newProduct);
         const { error } = await supabase
           .from('products')
