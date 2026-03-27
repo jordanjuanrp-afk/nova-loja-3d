@@ -103,18 +103,16 @@ export default function AdminPanel() {
   };
 
   const handleRejectOrder = async (orderId: string) => {
-    const reason = prompt('Motivo da recusa (opcional):');
-    
     try {
       const { error } = await supabase
         .from('orders')
-        .update({ status: 'rejected', rejection_reason: reason || 'Sem motivo informado', updated_at: new Date().toISOString() })
+        .update({ status: 'rejected', updated_at: new Date().toISOString() })
         .eq('id', orderId);
       
       if (error) throw error;
       
       toast.success('Pedido recusado', {
-        description: reason ? `Motivo: ${reason}` : 'O cliente será notificado.'
+        description: 'O cliente será notificado.'
       });
       
       fetchOrders();
@@ -765,12 +763,7 @@ export default function AdminPanel() {
                           <span className="text-white font-bold">{order.customer_email}</span>
                         </div>
                       )}
-                      {order.rejection_reason && (
-                        <div className="flex justify-between text-sm">
-                          <span className="text-red-400">Motivo da Recusa:</span>
-                          <span className="text-red-300 font-bold">{order.rejection_reason}</span>
-                        </div>
-                      )}
+                      
                     </div>
 
                     {/* Expanded Details */}
