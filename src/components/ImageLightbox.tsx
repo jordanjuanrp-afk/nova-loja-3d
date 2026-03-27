@@ -54,7 +54,7 @@ const ImageLightbox: React.FC<ImageLightboxProps> = ({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-[100] flex items-center justify-center"
+      className="fixed inset-0 z-[100] flex items-center justify-center cursor-pointer"
       onClick={onClose}
     >
       <div className="absolute inset-0 bg-black/95 backdrop-blur-md" />
@@ -67,16 +67,17 @@ const ImageLightbox: React.FC<ImageLightboxProps> = ({
         className="relative z-10 w-full h-full flex flex-col items-center justify-center p-4"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="absolute top-4 left-4 right-4 flex items-center justify-between">
-          <span className="text-white/60 text-sm font-medium">
+        <button
+          onClick={onClose}
+          className="absolute top-6 right-6 z-20 p-4 bg-white/10 hover:bg-white/30 border border-white/20 rounded-full transition-all cursor-pointer backdrop-blur-md group"
+        >
+          <X size={28} className="text-white group-hover:rotate-90 transition-transform duration-300" />
+        </button>
+
+        <div className="absolute top-4 left-4 z-10">
+          <span className="text-white/60 text-sm font-medium bg-black/40 px-3 py-1 rounded-full backdrop-blur-sm">
             {productName && `${productName} - `}{currentIndex + 1} / {images.length}
           </span>
-          <button
-            onClick={onClose}
-            className="p-2 bg-white/10 hover:bg-white/20 rounded-full transition-colors"
-          >
-            <X size={24} className="text-white" />
-          </button>
         </div>
 
         <motion.div
@@ -84,12 +85,13 @@ const ImageLightbox: React.FC<ImageLightboxProps> = ({
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
           exit={{ opacity: 0, x: -20 }}
-          className="relative max-w-5xl max-h-[80vh] w-full h-full flex items-center justify-center"
+          className="relative max-w-6xl max-h-[85vh] w-full h-full flex items-center justify-center cursor-default"
+          onClick={(e) => e.stopPropagation()}
         >
           <img
             src={currentImage}
             alt={productName || 'Product image'}
-            className="max-w-full max-h-full object-contain rounded-lg shadow-2xl"
+            className="max-w-full max-h-[85vh] object-contain rounded-2xl shadow-2xl shadow-black/50"
             referrerPolicy="no-referrer"
           />
         </motion.div>
@@ -98,26 +100,26 @@ const ImageLightbox: React.FC<ImageLightboxProps> = ({
           <>
             <button
               onClick={(e) => { e.stopPropagation(); onPrev?.(); }}
-              className="absolute left-4 top-1/2 -translate-y-1/2 p-3 bg-white/10 hover:bg-white/20 rounded-full transition-colors"
+              className="absolute left-6 top-1/2 -translate-y-1/2 p-4 bg-white/10 hover:bg-white/30 border border-white/20 rounded-full transition-all backdrop-blur-md"
             >
               <ChevronLeft size={32} className="text-white" />
             </button>
             <button
               onClick={(e) => { e.stopPropagation(); onNext?.(); }}
-              className="absolute right-4 top-1/2 -translate-y-1/2 p-3 bg-white/10 hover:bg-white/20 rounded-full transition-colors"
+              className="absolute right-6 top-1/2 -translate-y-1/2 p-4 bg-white/10 hover:bg-white/30 border border-white/20 rounded-full transition-all backdrop-blur-md"
             >
               <ChevronRight size={32} className="text-white" />
             </button>
 
-            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+            <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-3 bg-black/40 backdrop-blur-sm px-4 py-2 rounded-full">
               {images.map((_, index) => (
                 <button
                   key={index}
                   onClick={(e) => { e.stopPropagation(); }}
-                  className={`w-2 h-2 rounded-full transition-all ${
+                  className={`w-2.5 h-2.5 rounded-full transition-all ${
                     index === currentIndex 
-                      ? 'bg-white w-6' 
-                      : 'bg-white/40 hover:bg-white/60'
+                      ? 'bg-white w-8' 
+                      : 'bg-white/40 hover:bg-white/70'
                   }`}
                 />
               ))}
