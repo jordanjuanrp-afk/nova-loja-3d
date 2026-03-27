@@ -103,21 +103,23 @@ export default function AdminPanel() {
   };
 
   const handleRejectOrder = async (orderId: string) => {
+    if (!confirm('Tem certeza que deseja excluir este pedido? Esta ação não pode ser desfeita.')) return;
+    
     try {
       const { error } = await supabase
         .from('orders')
-        .update({ status: 'rejected' })
+        .delete()
         .eq('id', orderId);
       
       if (error) throw error;
       
-      toast.success('Pedido recusado', {
-        description: 'O cliente será notificado.'
+      toast.success('Pedido removido', {
+        description: 'O pedido foi excluído permanentemente.'
       });
       
       fetchOrders();
     } catch (error: any) {
-      toast.error('Erro ao recusar pedido: ' + error.message);
+      toast.error('Erro ao remover pedido: ' + error.message);
     }
   };
 
