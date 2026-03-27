@@ -1,4 +1,4 @@
-import { useState, useEffect, FormEvent } from 'react';
+import React, { useState, useEffect, FormEvent } from 'react';
 import { Plus, Trash2, Edit2, Save, X, Package, DollarSign, Tag, Layers, Maximize, Palette, Sparkles, AlertCircle, User, Mail, MessageSquare, Image, GripVertical, ShoppingCart, Bell, Check, XCircle, Clock, CheckCircle, ChevronDown, ChevronUp, Video } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { supabase } from '../lib/supabase';
@@ -187,7 +187,7 @@ export default function AdminPanel() {
           category: formData.category,
           image: formData.image,
           images: formData.images,
-          video_url: formData.videoUrl || null,
+          video_url: formData.videoUrl || '',
           material: formData.material,
           size: formData.size,
           colors: formData.colors,
@@ -302,6 +302,22 @@ export default function AdminPanel() {
       ...formData,
       images: (formData.images || []).filter((_, i) => i !== index)
     });
+  };
+
+  const handleVideoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 100 * 1024 * 1024) {
+      toast.error('Vídeo muito grande. Máximo 100MB.');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      setFormData({...formData, videoUrl: reader.result as string});
+    };
+    reader.readAsDataURL(file);
   };
 
   return (
@@ -524,18 +540,36 @@ export default function AdminPanel() {
                     </div>
 
                     <div className="space-y-2">
-                      <label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">URL do Vídeo (YouTube/Vimeo)</label>
+                      <label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">Vídeo do Produto</label>
                       <div className="relative">
-                        <Video className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" size={18} />
+                        <Video className="absolute left-4 top-4 text-gray-500" size={18} />
                         <input
-                          type="url"
-                          value={formData.videoUrl || ''}
-                          onChange={e => setFormData({...formData, videoUrl: e.target.value})}
-                          placeholder="https://www.youtube.com/watch?v=..."
-                          className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-white outline-none focus:border-purple-500 transition-all"
+                          type="file"
+                          accept="video/*"
+                          onChange={e => handleVideoUpload(e)}
+                          className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-white outline-none focus:border-purple-500 transition-all file:mr-4 file:py-1 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-purple-500 file:text-white hover:file:bg-purple-400 file:cursor-pointer"
                         />
                       </div>
-                      <p className="text-xs text-gray-500 ml-1">Cole a URL do YouTube ou Vimeo para adicionar um vídeo ao produto</p>
+                      {formData.videoUrl && (
+                        <div className="mt-3 p-3 bg-white/5 rounded-xl border border-white/10">
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm text-green-400 truncate flex-1">{formData.videoUrl.split('/').pop()}</span>
+                            <button
+                              type="button"
+                              onClick={() => setFormData({...formData, videoUrl: ''})}
+                              className="ml-3 text-red-400 hover:text-red-300"
+                            >
+                              <X size={16} />
+                            </button>
+                          </div>
+                          <video 
+                            src={formData.videoUrl} 
+                            controls 
+                            className="mt-3 w-full h-32 object-cover rounded-lg"
+                          />
+                        </div>
+                      )}
+                      <p className="text-xs text-gray-500 ml-1">Formatos: MP4, WebM, MOV (máx. 100MB)</p>
                     </div>
                   </div>
 
