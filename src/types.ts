@@ -6,6 +6,7 @@ export interface Product {
   category: 'articulado' | 'personalizado' | 'miniatura' | 'educativo';
   image: string;
   images?: string[];
+  videoUrl?: string;
   isNew?: boolean;
   isBestSeller?: boolean;
   material: string;

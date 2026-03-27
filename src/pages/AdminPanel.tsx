@@ -1,5 +1,5 @@
 import { useState, useEffect, FormEvent } from 'react';
-import { Plus, Trash2, Edit2, Save, X, Package, DollarSign, Tag, Layers, Maximize, Palette, Sparkles, AlertCircle, User, Mail, MessageSquare, Image, GripVertical, ShoppingCart, Bell, Check, XCircle, Clock, CheckCircle, ChevronDown, ChevronUp } from 'lucide-react';
+import { Plus, Trash2, Edit2, Save, X, Package, DollarSign, Tag, Layers, Maximize, Palette, Sparkles, AlertCircle, User, Mail, MessageSquare, Image, GripVertical, ShoppingCart, Bell, Check, XCircle, Clock, CheckCircle, ChevronDown, ChevronUp, Video } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { supabase } from '../lib/supabase';
 import { Product } from '../types';
@@ -24,6 +24,7 @@ export default function AdminPanel() {
     category: 'articulado',
     image: 'https://picsum.photos/seed/toy/800/800',
     images: [],
+    videoUrl: '',
     material: 'PLA Premium',
     size: '15cm',
     colors: ['Azul', 'Vermelho', 'Verde', 'Preto', 'Branco'],
@@ -158,7 +159,8 @@ export default function AdminPanel() {
         const mappedData = data.map(p => ({
           ...p,
           isNew: p.is_new,
-          isBestSeller: p.is_best_seller
+          isBestSeller: p.is_best_seller,
+          videoUrl: p.video_url
         }));
         setProducts(mappedData);
       } else {
@@ -185,6 +187,7 @@ export default function AdminPanel() {
           category: formData.category,
           image: formData.image,
           images: formData.images,
+          video_url: formData.videoUrl || null,
           material: formData.material,
           size: formData.size,
           colors: formData.colors,
@@ -272,6 +275,7 @@ export default function AdminPanel() {
       category: 'articulado',
       image: 'https://picsum.photos/seed/toy/800/800',
       images: [],
+      videoUrl: '',
       material: 'PLA Premium',
       size: '15cm',
       colors: ['Azul', 'Vermelho', 'Verde', 'Preto', 'Branco'],
@@ -517,6 +521,21 @@ export default function AdminPanel() {
                           ))}
                         </div>
                       )}
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">URL do Vídeo (YouTube/Vimeo)</label>
+                      <div className="relative">
+                        <Video className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" size={18} />
+                        <input
+                          type="url"
+                          value={formData.videoUrl || ''}
+                          onChange={e => setFormData({...formData, videoUrl: e.target.value})}
+                          placeholder="https://www.youtube.com/watch?v=..."
+                          className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-white outline-none focus:border-purple-500 transition-all"
+                        />
+                      </div>
+                      <p className="text-xs text-gray-500 ml-1">Cole a URL do YouTube ou Vimeo para adicionar um vídeo ao produto</p>
                     </div>
                   </div>
 

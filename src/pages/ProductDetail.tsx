@@ -12,6 +12,22 @@ interface ProductDetailProps {
   onAddToCart: (product: Product, quantity: number, color: string) => void;
 }
 
+function getEmbedUrl(url: string): string {
+  if (url.includes('youtube.com/watch')) {
+    const videoId = url.split('v=')[1]?.split('&')[0];
+    return `https://www.youtube.com/embed/${videoId}`;
+  }
+  if (url.includes('youtu.be/')) {
+    const videoId = url.split('youtu.be/')[1]?.split('?')[0];
+    return `https://www.youtube.com/embed/${videoId}`;
+  }
+  if (url.includes('vimeo.com/')) {
+    const videoId = url.split('vimeo.com/')[1]?.split('?')[0];
+    return `https://player.vimeo.com/video/${videoId}`;
+  }
+  return url;
+}
+
 export default function ProductDetail({ onAddToCart }: ProductDetailProps) {
   const { id } = useParams<{ id: string }>();
   const [product, setProduct] = useState<Product | null>(null);
@@ -38,7 +54,8 @@ export default function ProductDetail({ onAddToCart }: ProductDetailProps) {
           const mappedData = {
             ...data,
             isNew: data.is_new,
-            isBestSeller: data.is_best_seller
+            isBestSeller: data.is_best_seller,
+            videoUrl: data.video_url
           };
           setProduct(mappedData);
           setSelectedColor(mappedData.colors[0]);
@@ -119,6 +136,22 @@ export default function ProductDetail({ onAddToCart }: ProductDetailProps) {
                 </div>
               ))}
             </div>
+
+            {/* Video Section */}
+            {product.videoUrl && (
+              <div className="mt-6">
+                <h3 className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-4">Vídeo do Produto</h3>
+                <div className="relative aspect-video rounded-2xl overflow-hidden bg-white/5 border border-white/10">
+                  <iframe
+                    src={getEmbedUrl(product.videoUrl)}
+                    className="w-full h-full"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                    title="Product Video"
+                  />
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Product Info Section */}
