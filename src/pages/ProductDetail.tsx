@@ -1,12 +1,13 @@
 import { useParams, Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
-import { ShoppingCart, Heart, Share2, Star, Shield, Zap, Box, Check, ZoomIn } from 'lucide-react';
+import { ShoppingCart, Heart, Share2, Star, Shield, Zap, Box, Check, ZoomIn, Eye } from 'lucide-react';
 import { PRODUCTS } from '../constants';
 import { Product, CartItem } from '../types';
 import { formatCurrency, cn } from '../lib/utils';
 import { supabase } from '../lib/supabase';
 import ImageLightbox from '../components/ImageLightbox';
+import ProductPreview from '../components/ProductPreview';
 
 interface ProductDetailProps {
   onAddToCart: (product: Product, quantity: number, color: string) => void;
@@ -251,6 +252,7 @@ export default function ProductDetail({ onAddToCart }: ProductDetailProps) {
         <div className="mt-32">
           <div className="flex gap-12 border-b border-white/5 mb-12">
             {[
+              { id: 'preview', label: 'Preview 3D' },
               { id: 'desc', label: 'Descrição' },
               { id: 'spec', label: 'Especificações' },
               { id: 'eval', label: 'Avaliações' }
@@ -259,10 +261,11 @@ export default function ProductDetail({ onAddToCart }: ProductDetailProps) {
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as any)}
                 className={cn(
-                  "pb-6 text-sm font-black uppercase tracking-widest transition-all relative",
+                  "pb-6 text-sm font-black uppercase tracking-widest transition-all relative flex items-center gap-2",
                   activeTab === tab.id ? "text-white" : "text-gray-500 hover:text-gray-300"
                 )}
               >
+                {tab.id === 'preview' && <Eye size={16} />}
                 {tab.label}
                 {activeTab === tab.id && (
                   <motion.div layoutId="activeTab" className="absolute bottom-0 left-0 right-0 h-1 bg-blue-500" />
@@ -272,6 +275,15 @@ export default function ProductDetail({ onAddToCart }: ProductDetailProps) {
           </div>
 
           <div className="max-w-4xl text-gray-400 leading-relaxed text-lg">
+            {activeTab === 'preview' && (
+              <div className="space-y-6">
+                <ProductPreview
+                  imageUrl={product.image}
+                  productName={product.name}
+                />
+              </div>
+            )}
+            
             {activeTab === 'desc' && (
               <div className="space-y-6">
                 <p>{product.description}</p>
