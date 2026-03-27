@@ -181,30 +181,43 @@ export default function AdminPanel() {
 
     try {
       if (editingId) {
-        const updateData = {
+        const updateData: any = {
           name: formData.name,
           description: formData.description,
           price: formData.price,
           category: formData.category,
           image: formData.image,
           images: formData.images,
-          video_url: formData.videoUrl || null,
           material: formData.material,
           size: formData.size,
           colors: formData.colors,
           is_new: formData.isNew,
           is_best_seller: formData.isBestSeller
         };
-        const { error } = await supabase
-          .from('products')
-          .update(updateData)
-          .eq('id', editingId)
-          ;
         
-        if (error) throw error;
+        try {
+          updateData.video_url = formData.videoUrl || null;
+          const { error } = await supabase
+            .from('products')
+            .update(updateData)
+            .eq('id', editingId);
+          
+          if (error) throw error;
+        } catch (videoError: any) {
+          if (videoError.message?.includes('video_url')) {
+            const { error } = await supabase
+              .from('products')
+              .update(updateData)
+              .eq('id', editingId);
+            if (error) throw error;
+          } else {
+            throw videoError;
+          }
+        }
+        
         toast.success('Produto atualizado com sucesso!');
       } else {
-        const newProduct = {
+        const newProduct: any = {
           id: Math.random().toString(36).substr(2, 9),
           name: formData.name!,
           description: formData.description!,
@@ -212,7 +225,6 @@ export default function AdminPanel() {
           category: formData.category!,
           image: formData.image!,
           images: formData.images || [],
-          video_url: formData.videoUrl || null,
           material: formData.material!,
           size: formData.size!,
           colors: formData.colors!,
@@ -220,10 +232,24 @@ export default function AdminPanel() {
           is_best_seller: formData.isBestSeller ?? false,
           created_at: new Date().toISOString()
         };
-        const { error } = await supabase
-          .from('products')
-          .insert([newProduct])
-          ;
+        
+        let error: any;
+        try {
+          newProduct.video_url = formData.videoUrl || null;
+          const result = await supabase
+            .from('products')
+            .insert([newProduct]);
+          error = result.error;
+        } catch (e: any) {
+          if (e.message?.includes('video_url')) {
+            const result = await supabase
+              .from('products')
+              .insert([newProduct]);
+            error = result.error;
+          } else {
+            throw e;
+          }
+        }
         
         if (error) throw error;
         toast.success('Produto criado com sucesso!');
