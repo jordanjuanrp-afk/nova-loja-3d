@@ -1,5 +1,5 @@
 import React, { useState, useEffect, FormEvent } from 'react';
-import { Plus, Trash2, Edit2, Save, X, Package, DollarSign, Tag, Layers, Maximize, Palette, Sparkles, AlertCircle, User, Mail, MessageSquare, Image, GripVertical, ShoppingCart, Bell, Check, XCircle, Clock, CheckCircle, ChevronDown, ChevronUp, Video } from 'lucide-react';
+import { Plus, Trash2, Edit2, Save, X, Package, DollarSign, Tag, Layers, Maximize, Palette, Sparkles, AlertCircle, User, Mail, MessageSquare, Image, GripVertical, ShoppingCart, Bell, Check, XCircle, Clock, CheckCircle, ChevronDown, ChevronUp } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { supabase } from '../lib/supabase';
 import { Product } from '../types';
@@ -24,7 +24,6 @@ export default function AdminPanel() {
     category: 'articulado',
     image: 'https://picsum.photos/seed/toy/800/800',
     images: [],
-    videoUrl: '',
     material: 'PLA Premium',
     size: '15cm',
     colors: ['Azul', 'Vermelho', 'Verde', 'Preto', 'Branco'],
@@ -181,7 +180,7 @@ export default function AdminPanel() {
 
     try {
       if (editingId) {
-        const updateData: any = {
+        const updateData = {
           name: formData.name,
           description: formData.description,
           price: formData.price,
@@ -195,29 +194,15 @@ export default function AdminPanel() {
           is_best_seller: formData.isBestSeller
         };
         
-        try {
-          updateData.video_url = formData.videoUrl || null;
-          const { error } = await supabase
-            .from('products')
-            .update(updateData)
-            .eq('id', editingId);
-          
-          if (error) throw error;
-        } catch (videoError: any) {
-          if (videoError.message?.includes('video_url')) {
-            const { error } = await supabase
-              .from('products')
-              .update(updateData)
-              .eq('id', editingId);
-            if (error) throw error;
-          } else {
-            throw videoError;
-          }
-        }
+        const { error } = await supabase
+          .from('products')
+          .update(updateData)
+          .eq('id', editingId);
         
+        if (error) throw error;
         toast.success('Produto atualizado com sucesso!');
       } else {
-        const newProduct: any = {
+        const newProduct = {
           id: Math.random().toString(36).substr(2, 9),
           name: formData.name!,
           description: formData.description!,
@@ -233,23 +218,9 @@ export default function AdminPanel() {
           created_at: new Date().toISOString()
         };
         
-        let error: any;
-        try {
-          newProduct.video_url = formData.videoUrl || null;
-          const result = await supabase
-            .from('products')
-            .insert([newProduct]);
-          error = result.error;
-        } catch (e: any) {
-          if (e.message?.includes('video_url')) {
-            const result = await supabase
-              .from('products')
-              .insert([newProduct]);
-            error = result.error;
-          } else {
-            throw e;
-          }
-        }
+        const { error } = await supabase
+          .from('products')
+          .insert([newProduct]);
         
         if (error) throw error;
         toast.success('Produto criado com sucesso!');
@@ -300,7 +271,6 @@ export default function AdminPanel() {
       category: 'articulado',
       image: 'https://picsum.photos/seed/toy/800/800',
       images: [],
-      videoUrl: '',
       material: 'PLA Premium',
       size: '15cm',
       colors: ['Azul', 'Vermelho', 'Verde', 'Preto', 'Branco'],
@@ -327,22 +297,6 @@ export default function AdminPanel() {
       ...formData,
       images: (formData.images || []).filter((_, i) => i !== index)
     });
-  };
-
-  const handleVideoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    if (file.size > 100 * 1024 * 1024) {
-      toast.error('Vídeo muito grande. Máximo 100MB.');
-      return;
-    }
-
-    const reader = new FileReader();
-    reader.onload = () => {
-      setFormData({...formData, videoUrl: reader.result as string});
-    };
-    reader.readAsDataURL(file);
   };
 
   return (
@@ -562,39 +516,6 @@ export default function AdminPanel() {
                           ))}
                         </div>
                       )}
-                    </div>
-
-                    <div className="space-y-2">
-                      <label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">Vídeo do Produto</label>
-                      <div className="relative">
-                        <Video className="absolute left-4 top-4 text-gray-500" size={18} />
-                        <input
-                          type="file"
-                          accept="video/*"
-                          onChange={e => handleVideoUpload(e)}
-                          className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-white outline-none focus:border-purple-500 transition-all file:mr-4 file:py-1 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-purple-500 file:text-white hover:file:bg-purple-400 file:cursor-pointer"
-                        />
-                      </div>
-                      {formData.videoUrl && (
-                        <div className="mt-3 p-3 bg-white/5 rounded-xl border border-white/10">
-                          <div className="flex items-center justify-between">
-                            <span className="text-sm text-green-400 truncate flex-1">{formData.videoUrl.split('/').pop()}</span>
-                            <button
-                              type="button"
-                              onClick={() => setFormData({...formData, videoUrl: ''})}
-                              className="ml-3 text-red-400 hover:text-red-300"
-                            >
-                              <X size={16} />
-                            </button>
-                          </div>
-                          <video 
-                            src={formData.videoUrl} 
-                            controls 
-                            className="mt-3 w-full h-32 object-cover rounded-lg"
-                          />
-                        </div>
-                      )}
-                      <p className="text-xs text-gray-500 ml-1">Formatos: MP4, WebM, MOV (máx. 100MB)</p>
                     </div>
                   </div>
 
