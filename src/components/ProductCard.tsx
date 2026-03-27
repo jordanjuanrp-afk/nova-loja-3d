@@ -58,8 +58,17 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart }) => {
           referrerPolicy="no-referrer"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-        <div className="absolute bottom-4 right-4 p-2 bg-black/60 backdrop-blur-md rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
+        
+        {/* Zoom Icon - always visible on mobile */}
+        <div className="absolute bottom-4 right-4 p-2 bg-black/60 backdrop-blur-md rounded-full opacity-0 group-hover:opacity-100 sm:opacity-0 transition-opacity">
           <ZoomIn size={16} className="text-white" />
+        </div>
+        
+        {/* Touch hint for mobile */}
+        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-0 sm:opacity-0 group-active:opacity-100 transition-opacity">
+          <div className="p-3 bg-black/50 backdrop-blur-md rounded-full">
+            <ZoomIn size={24} className="text-white" />
+          </div>
         </div>
         
         {/* Quick Add Button */}
