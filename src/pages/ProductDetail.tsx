@@ -18,11 +18,13 @@ export default function ProductDetail({ onAddToCart }: ProductDetailProps) {
   const [product, setProduct] = useState<Product | null>(null);
   const [selectedColor, setSelectedColor] = useState('');
   const [quantity, setQuantity] = useState(1);
-  const [activeTab, setActiveTab] = useState<'desc' | 'spec' | 'eval'>('desc');
+  const [activeTab, setActiveTab] = useState<'preview' | 'desc' | 'spec' | 'eval'>('desc');
   const [isLoading, setIsLoading] = useState(true);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
   const [mainImageIndex, setMainImageIndex] = useState(0);
+
+  const allImages = product ? [product.image, ...(product.images || [])] : [''];
 
   useEffect(() => {
     async function fetchProduct() {
@@ -92,7 +94,7 @@ export default function ProductDetail({ onAddToCart }: ProductDetailProps) {
               onClick={() => { setLightboxIndex(mainImageIndex); setLightboxOpen(true); }}
             >
               <img
-                src={product.image}
+                src={allImages[mainImageIndex] || product.image}
                 alt={product.name}
                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                 referrerPolicy="no-referrer"
@@ -106,35 +108,38 @@ export default function ProductDetail({ onAddToCart }: ProductDetailProps) {
               </div>
             </motion.div>
 
-            {/* Thumbnail Gallery (Mock) */}
+            {/* Thumbnail Gallery */}
             <div className="grid grid-cols-4 gap-4">
-              {[...Array(4)].map((_, i) => (
-                <div 
-                  key={i} 
-                  className={cn(
-                    "aspect-square rounded-2xl bg-white/5 border overflow-hidden cursor-pointer transition-all",
-                    mainImageIndex === i ? "border-blue-500" : "border-white/10 hover:border-blue-500"
-                  )}
-                  onClick={() => setMainImageIndex(i)}
-                >
-                  <img src={product.image} alt="" className="w-full h-full object-cover opacity-50 hover:opacity-100 transition-opacity" referrerPolicy="no-referrer" />
+              {product.images && product.images.length > 0 ? (
+                <>
+                  <div 
+                    className={cn(
+                      "aspect-square rounded-2xl bg-white/5 border overflow-hidden cursor-pointer transition-all",
+                      mainImageIndex === 0 ? "border-blue-500 ring-2 ring-blue-500/50" : "border-white/10 hover:border-blue-500"
+                    )}
+                    onClick={() => setMainImageIndex(0)}
+                  >
+                    <img src={product.image} alt="" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                  </div>
+                  {product.images.map((img, i) => (
+                    <div 
+                      key={i} 
+                      className={cn(
+                        "aspect-square rounded-2xl bg-white/5 border overflow-hidden cursor-pointer transition-all",
+                        mainImageIndex === i + 1 ? "border-blue-500 ring-2 ring-blue-500/50" : "border-white/10 hover:border-blue-500"
+                      )}
+                      onClick={() => setMainImageIndex(i + 1)}
+                    >
+                      <img src={img} alt="" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                    </div>
+                  ))}
+                </>
+              ) : (
+                <div className="col-span-4 text-center text-gray-500 py-8">
+                  Adicione imagens adicionais ao produto
                 </div>
-              ))}
+              )}
             </div>
-
-            {/* Video Section */}
-            {product.videoUrl && (
-              <div className="mt-6">
-                <h3 className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-4">Vídeo do Produto</h3>
-                <div className="relative aspect-video rounded-2xl overflow-hidden bg-white/5 border border-white/10">
-                  <video
-                    src={product.videoUrl}
-                    controls
-                    className="w-full h-full object-contain"
-                  />
-                </div>
-              </div>
-            )}
           </div>
 
           {/* Product Info Section */}
@@ -348,10 +353,12 @@ export default function ProductDetail({ onAddToCart }: ProductDetailProps) {
       </div>
 
       <ImageLightbox
-        images={[product.image]}
-        currentIndex={0}
+        images={allImages}
+        currentIndex={lightboxIndex}
         isOpen={lightboxOpen}
         onClose={() => setLightboxOpen(false)}
+        onNext={() => setLightboxIndex(prev => (prev + 1) % allImages.length)}
+        onPrev={() => setLightboxIndex(prev => (prev - 1 + allImages.length) % allImages.length)}
         productName={product.name}
       />
     </div>
