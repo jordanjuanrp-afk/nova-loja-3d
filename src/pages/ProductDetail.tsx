@@ -125,18 +125,6 @@ export default function ProductDetail({ onAddToCart }: ProductDetailProps) {
                 )}
               </div>
               
-              {/* Debug info - mostre as imagens carregadas */}
-              <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-3 text-xs">
-                <div className="text-yellow-400 font-bold mb-2">Debug - Imagens Carregadas:</div>
-                <div className="text-gray-400">Imagem Principal: {product.image ? 'OK' : 'Faltando'}</div>
-                <div className="text-gray-400">Imagens Adicionais: {product.images?.length || 0}</div>
-                <div className="text-gray-500 mt-1">
-                  {product.images?.map((img, i) => (
-                    <div key={i} className="truncate">{i+1}. {img}</div>
-                  ))}
-                </div>
-              </div>
-              
               <div className="grid grid-cols-4 gap-3">
                 <div 
                   className={cn(
