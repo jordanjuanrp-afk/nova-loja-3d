@@ -180,19 +180,22 @@ export default function AdminPanel() {
 
     try {
       if (editingId) {
-        const updateData = {
+        const updateData: any = {
           name: formData.name,
           description: formData.description,
           price: formData.price,
           category: formData.category,
           image: formData.image,
-          images: formData.images,
           material: formData.material,
           size: formData.size,
           colors: formData.colors,
           is_new: formData.isNew,
           is_best_seller: formData.isBestSeller
         };
+        
+        if (formData.images && formData.images.length > 0) {
+          updateData.images = formData.images;
+        }
         
         const { error } = await supabase
           .from('products')
