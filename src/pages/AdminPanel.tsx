@@ -179,6 +179,8 @@ export default function AdminPanel() {
     setIsLoading(true);
 
     try {
+      console.log('Saving images:', formData.images);
+      
       if (editingId) {
         const updateData: any = {
           name: formData.name,
@@ -197,6 +199,8 @@ export default function AdminPanel() {
           updateData.images = formData.images;
         }
         
+        console.log('Update data:', updateData);
+        
         const { error } = await supabase
           .from('products')
           .update(updateData)
@@ -205,14 +209,13 @@ export default function AdminPanel() {
         if (error) throw error;
         toast.success('Produto atualizado com sucesso!');
       } else {
-        const newProduct = {
+        const newProduct: any = {
           id: Math.random().toString(36).substr(2, 9),
           name: formData.name!,
           description: formData.description!,
           price: formData.price!,
           category: formData.category!,
           image: formData.image!,
-          images: formData.images || [],
           material: formData.material!,
           size: formData.size!,
           colors: formData.colors!,
@@ -220,6 +223,12 @@ export default function AdminPanel() {
           is_best_seller: formData.isBestSeller ?? false,
           created_at: new Date().toISOString()
         };
+        
+        if (formData.images && formData.images.length > 0) {
+          newProduct.images = formData.images;
+        }
+        
+        console.log('Insert data:', newProduct);
         
         const { error } = await supabase
           .from('products')
