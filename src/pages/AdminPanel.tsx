@@ -182,19 +182,20 @@ export default function AdminPanel() {
       console.log('Saving images:', formData.images);
       
       if (editingId) {
-        const updateData = {
+        const updateData: any = {
           name: formData.name,
           description: formData.description,
           price: formData.price,
           category: formData.category,
           image: formData.image,
-          images: formData.images || [],
           material: formData.material,
           size: formData.size,
           colors: formData.colors,
           is_new: formData.isNew,
           is_best_seller: formData.isBestSeller
         };
+        
+        updateData.images = formData.images || [];
         
         const { error } = await supabase
           .from('products')
@@ -222,11 +223,7 @@ export default function AdminPanel() {
           created_at: new Date().toISOString()
         };
         
-        if (formData.images && formData.images.length > 0) {
-          newProduct.images = formData.images;
-        }
-        
-        console.log('Insert data:', newProduct);
+        newProduct.images = formData.images || [];
         
         const { error } = await supabase
           .from('products')
