@@ -182,12 +182,13 @@ export default function AdminPanel() {
       console.log('Saving images:', formData.images);
       
       if (editingId) {
-        const updateData: any = {
+        const updateData = {
           name: formData.name,
           description: formData.description,
           price: formData.price,
           category: formData.category,
           image: formData.image,
+          images: formData.images || [],
           material: formData.material,
           size: formData.size,
           colors: formData.colors,
@@ -195,18 +196,15 @@ export default function AdminPanel() {
           is_best_seller: formData.isBestSeller
         };
         
-        if (formData.images && formData.images.length > 0) {
-          updateData.images = formData.images;
-        }
-        
-        console.log('Update data:', updateData);
-        
         const { error } = await supabase
           .from('products')
           .update(updateData)
           .eq('id', editingId);
         
-        if (error) throw error;
+        if (error) {
+          toast.error('Erro ao atualizar: ' + error.message);
+          throw error;
+        }
         toast.success('Produto atualizado com sucesso!');
       } else {
         const newProduct: any = {
