@@ -500,16 +500,24 @@ export default function AdminPanel() {
 
                     <div className="space-y-2">
                       <label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">Imagens Adicionais</label>
-                      <div className="relative">
-                        <Image className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" size={18} />
-                        <input
-                          type="text"
-                          value={newImageUrl}
-                          onChange={e => setNewImageUrl(e.target.value)}
-                          onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), addImage())}
-                          placeholder="Cole URL e pressione Enter para adicionar"
-                          className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-white outline-none focus:border-purple-500 transition-all"
-                        />
+                      <div className="flex gap-2">
+                        <div className="relative flex-1">
+                          <Image className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" size={18} />
+                          <input
+                            type="text"
+                            value={newImageUrl}
+                            onChange={e => setNewImageUrl(e.target.value)}
+                            placeholder="Cole a URL da imagem"
+                            className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-white outline-none focus:border-purple-500 transition-all"
+                          />
+                        </div>
+                        <button
+                          type="button"
+                          onClick={addImage}
+                          className="px-6 py-4 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded-2xl transition-all"
+                        >
+                          Adicionar
+                        </button>
                       </div>
                       {formData.images && formData.images.length > 0 && (
                         <div className="flex flex-wrap gap-2 mt-2">
