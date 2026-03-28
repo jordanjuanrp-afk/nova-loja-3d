@@ -13,6 +13,8 @@ import CustomRequest from './pages/CustomRequest';
 import Login from './pages/Login';
 import Checkout from './pages/Checkout';
 import Payment from './pages/Payment';
+import CheckoutSuccess from './pages/CheckoutSuccess';
+import CheckoutFailure from './pages/CheckoutFailure';
 import { Product, CartItem, User } from './types';
 import { supabase } from './lib/supabase';
 
@@ -173,10 +175,10 @@ export default function App() {
               <Payment 
                 items={cartItems}
                 customerData={customerData}
-                user={user ? { id: user.id, name: user.name, email: user.email } : null}
-                onSuccess={handlePaymentSuccess}
               />
             } />
+            <Route path="/checkout/success" element={<CheckoutSuccess />} />
+            <Route path="/checkout/failure" element={<CheckoutFailure />} />
             <Route path="/contato" element={<div className="pt-32 text-center h-screen">Contato em breve...</div>} />
             {user?.role === 'admin' && (
               <Route path="/admin" element={<AdminPanel />} />
