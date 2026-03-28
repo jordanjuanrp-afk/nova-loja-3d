@@ -109,36 +109,55 @@ export default function ProductDetail({ onAddToCart }: ProductDetailProps) {
             </motion.div>
 
             {/* Thumbnail Gallery */}
-            <div className="grid grid-cols-4 gap-4">
-              {product.images && product.images.length > 0 ? (
-                <>
-                  <div 
-                    className={cn(
-                      "aspect-square rounded-2xl bg-white/5 border overflow-hidden cursor-pointer transition-all",
-                      mainImageIndex === 0 ? "border-blue-500 ring-2 ring-blue-500/50" : "border-white/10 hover:border-blue-500"
-                    )}
-                    onClick={() => setMainImageIndex(0)}
-                  >
-                    <img src={product.image} alt="" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">
+                  Galeria de Imagens
+                </span>
+                {product.images && product.images.length > 0 && (
+                  <span className="text-xs text-blue-400 font-medium">
+                    {allImages.length} imagens
+                  </span>
+                )}
+              </div>
+              <div className="grid grid-cols-4 gap-3">
+                <div 
+                  className={cn(
+                    "aspect-square rounded-xl bg-white/5 border overflow-hidden cursor-pointer transition-all hover:scale-105",
+                    mainImageIndex === 0 ? "border-blue-500 ring-2 ring-blue-500/50" : "border-white/10 hover:border-blue-500"
+                  )}
+                  onClick={() => setMainImageIndex(0)}
+                >
+                  <img src={product.image} alt="" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                  <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
+                    <span className="text-white text-xs font-bold">Principal</span>
                   </div>
-                  {product.images.map((img, i) => (
+                </div>
+                {product.images && product.images.length > 0 ? (
+                  product.images.map((img, i) => (
                     <div 
                       key={i} 
                       className={cn(
-                        "aspect-square rounded-2xl bg-white/5 border overflow-hidden cursor-pointer transition-all",
+                        "aspect-square rounded-xl bg-white/5 border overflow-hidden cursor-pointer transition-all hover:scale-105 relative",
                         mainImageIndex === i + 1 ? "border-blue-500 ring-2 ring-blue-500/50" : "border-white/10 hover:border-blue-500"
                       )}
                       onClick={() => setMainImageIndex(i + 1)}
                     >
                       <img src={img} alt="" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                      <div className="absolute bottom-1 right-1 bg-black/60 text-white text-[10px] px-1.5 py-0.5 rounded font-bold">
+                        {i + 2}
+                      </div>
                     </div>
-                  ))}
-                </>
-              ) : (
-                <div className="col-span-4 text-center text-gray-500 py-8">
-                  Adicione imagens adicionais ao produto
-                </div>
-              )}
+                  ))
+                ) : (
+                  <div className="col-span-3 text-center text-gray-500 py-4 text-sm">
+                    Adicione mais imagens no painel admin
+                  </div>
+                )}
+              </div>
+              <p className="text-xs text-gray-500 text-center">
+                Clique em uma imagem para ampliar
+              </p>
             </div>
           </div>
 
