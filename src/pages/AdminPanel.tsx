@@ -179,7 +179,8 @@ export default function AdminPanel() {
     setIsLoading(true);
 
     try {
-      console.log('Saving images:', formData.images);
+      console.log('Form data before save:', formData);
+      console.log('Images to save:', formData.images);
       
       if (editingId) {
         const updateData: any = {
@@ -196,6 +197,7 @@ export default function AdminPanel() {
         };
         
         updateData.images = formData.images || [];
+        console.log('Update data sent to DB:', updateData);
         
         const { error } = await supabase
           .from('products')
@@ -291,9 +293,11 @@ export default function AdminPanel() {
 
   const addImage = () => {
     if (newImageUrl.trim()) {
+      const newImages = [...(formData.images || []), newImageUrl.trim()];
+      console.log('Adding image, new images array:', newImages);
       setFormData({
         ...formData,
-        images: [...(formData.images || []), newImageUrl.trim()]
+        images: newImages
       });
       setNewImageUrl('');
     }
