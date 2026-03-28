@@ -38,15 +38,20 @@ export default function ProductDetail({ onAddToCart }: ProductDetailProps) {
         
         if (error) throw error;
         if (data) {
+          console.log('Raw product data:', data);
+          console.log('Images from DB:', data.images);
           const mappedData = {
             ...data,
             isNew: data.is_new,
             isBestSeller: data.is_best_seller,
             videoUrl: data.video_url,
-            images: data.images || []
+            images: Array.isArray(data.images) ? data.images : []
           };
+          console.log('Mapped product:', mappedData);
           setProduct(mappedData);
-          setSelectedColor(mappedData.colors[0]);
+          if (mappedData.colors && mappedData.colors.length > 0) {
+            setSelectedColor(mappedData.colors[0]);
+          }
           setMainImageIndex(0);
         }
       } catch (error) {
