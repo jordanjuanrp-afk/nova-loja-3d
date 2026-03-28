@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { initMercadoPago, Wallet } from '@mercadopago/sdk-react';
 import { X, CreditCard, Check, AlertCircle } from 'lucide-react';
 
-initMercadoPago(import.meta.env.VITE_MERCADOPAGO_PUBLIC_KEY);
+initMercadoPago(import.meta.env.MERCADOPAGO_PUBLIC_KEY);
 
 interface MercadoPagoCheckoutProps {
   preferenceId: string | null;

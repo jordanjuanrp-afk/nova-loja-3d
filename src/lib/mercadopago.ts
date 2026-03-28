@@ -96,7 +96,7 @@ export async function getMercadoPagoPaymentStatus(paymentId: string) {
     `https://api.mercadopago.com/v1/payments/${paymentId}`,
     {
       headers: {
-        'Authorization': `Bearer ${import.meta.env.MERCADOPAGO_ACCESS_TOKEN}`,
+      'Authorization': `Bearer ${import.meta.env.VITE_MERCADOPAGO_ACCESS_TOKEN}`,
       },
     }
   );
