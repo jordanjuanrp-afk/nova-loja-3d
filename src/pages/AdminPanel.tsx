@@ -179,11 +179,10 @@ export default function AdminPanel() {
     setIsLoading(true);
 
     try {
-      console.log('Form data before save:', formData);
-      console.log('Images to save:', formData.images);
+      console.log('📦 Salvando produto com imagens:', formData.images);
       
       if (editingId) {
-        const updateData: any = {
+        const updateData = {
           name: formData.name,
           description: formData.description,
           price: formData.price,
@@ -193,11 +192,11 @@ export default function AdminPanel() {
           size: formData.size,
           colors: formData.colors,
           is_new: formData.isNew,
-          is_best_seller: formData.isBestSeller
+          is_best_seller: formData.isBestSeller,
+          images: formData.images || []
         };
         
-        updateData.images = formData.images || [];
-        console.log('Update data sent to DB:', updateData);
+        console.log('📤 Enviando para DB:', updateData);
         
         const { error } = await supabase
           .from('products')
@@ -205,9 +204,11 @@ export default function AdminPanel() {
           .eq('id', editingId);
         
         if (error) {
+          console.error('❌ Erro do DB:', error);
           toast.error('Erro ao atualizar: ' + error.message);
           throw error;
         }
+        console.log('✅ Produto atualizado com sucesso!');
         toast.success('Produto atualizado com sucesso!');
       } else {
         const newProduct: any = {
@@ -294,11 +295,11 @@ export default function AdminPanel() {
   const addImage = () => {
     if (newImageUrl.trim()) {
       const newImages = [...(formData.images || []), newImageUrl.trim()];
-      console.log('Adding image, new images array:', newImages);
       setFormData({
         ...formData,
         images: newImages
       });
+      console.log('✅ Imagem adicionada ao formulário:', newImages);
       setNewImageUrl('');
     }
   };
