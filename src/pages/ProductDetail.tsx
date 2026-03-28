@@ -42,10 +42,12 @@ export default function ProductDetail({ onAddToCart }: ProductDetailProps) {
             ...data,
             isNew: data.is_new,
             isBestSeller: data.is_best_seller,
-            videoUrl: data.video_url
+            videoUrl: data.video_url,
+            images: data.images || []
           };
           setProduct(mappedData);
           setSelectedColor(mappedData.colors[0]);
+          setMainImageIndex(0);
         }
       } catch (error) {
         console.error('Error fetching product from Supabase:', error);
