@@ -38,8 +38,6 @@ export default function ProductDetail({ onAddToCart }: ProductDetailProps) {
         
         if (error) throw error;
         if (data) {
-          console.log('Raw product data:', data);
-          console.log('Images from DB:', data.images);
           const mappedData = {
             ...data,
             isNew: data.is_new,
@@ -47,7 +45,6 @@ export default function ProductDetail({ onAddToCart }: ProductDetailProps) {
             videoUrl: data.video_url,
             images: Array.isArray(data.images) ? data.images : []
           };
-          console.log('Mapped product:', mappedData);
           setProduct(mappedData);
           if (mappedData.colors && mappedData.colors.length > 0) {
             setSelectedColor(mappedData.colors[0]);
@@ -127,17 +124,30 @@ export default function ProductDetail({ onAddToCart }: ProductDetailProps) {
                   </span>
                 )}
               </div>
+              
+              {/* Debug info - mostre as imagens carregadas */}
+              <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-3 text-xs">
+                <div className="text-yellow-400 font-bold mb-2">Debug - Imagens Carregadas:</div>
+                <div className="text-gray-400">Imagem Principal: {product.image ? 'OK' : 'Faltando'}</div>
+                <div className="text-gray-400">Imagens Adicionais: {product.images?.length || 0}</div>
+                <div className="text-gray-500 mt-1">
+                  {product.images?.map((img, i) => (
+                    <div key={i} className="truncate">{i+1}. {img}</div>
+                  ))}
+                </div>
+              </div>
+              
               <div className="grid grid-cols-4 gap-3">
                 <div 
                   className={cn(
-                    "aspect-square rounded-xl bg-white/5 border overflow-hidden cursor-pointer transition-all hover:scale-105",
+                    "aspect-square rounded-xl bg-white/5 border overflow-hidden cursor-pointer transition-all hover:scale-105 relative",
                     mainImageIndex === 0 ? "border-blue-500 ring-2 ring-blue-500/50" : "border-white/10 hover:border-blue-500"
                   )}
                   onClick={() => setMainImageIndex(0)}
                 >
                   <img src={product.image} alt="" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
-                  <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
-                    <span className="text-white text-xs font-bold">Principal</span>
+                  <div className="absolute bottom-1 left-1 bg-blue-500 text-white text-[10px] px-1.5 py-0.5 rounded font-bold">
+                    1
                   </div>
                 </div>
                 {product.images && product.images.length > 0 ? (
@@ -151,7 +161,7 @@ export default function ProductDetail({ onAddToCart }: ProductDetailProps) {
                       onClick={() => setMainImageIndex(i + 1)}
                     >
                       <img src={img} alt="" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
-                      <div className="absolute bottom-1 right-1 bg-black/60 text-white text-[10px] px-1.5 py-0.5 rounded font-bold">
+                      <div className="absolute bottom-1 left-1 bg-black/60 text-white text-[10px] px-1.5 py-0.5 rounded font-bold">
                         {i + 2}
                       </div>
                     </div>
