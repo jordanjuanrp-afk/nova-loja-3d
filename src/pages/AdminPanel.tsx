@@ -6,6 +6,7 @@ import { Product } from '../types';
 import { toast } from 'sonner';
 import { PRODUCTS } from '../constants';
 import { cn } from '../lib/utils';
+import EmailReplyModal from '../components/EmailReplyModal';
 
 export default function AdminPanel() {
   const [activeTab, setActiveTab] = useState<'products' | 'suggestions' | 'orders'>('products');
@@ -16,6 +17,8 @@ export default function AdminPanel() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [expandedOrders, setExpandedOrders] = useState<Set<string>>(new Set());
+  const [emailModalOpen, setEmailModalOpen] = useState(false);
+  const [selectedSuggestion, setSelectedSuggestion] = useState<any>(null);
   
   const [formData, setFormData] = useState<Partial<Product>>({
     name: '',
@@ -738,12 +741,15 @@ export default function AdminPanel() {
                   </div>
 
                   <div className="flex justify-end gap-4 pt-4 border-t border-white/5">
-                    <a 
-                      href={`mailto:${sug.user_email}?subject=ToyVerse - Sua sugestão de brinquedo`}
+                    <button 
+                      onClick={() => {
+                        setSelectedSuggestion(sug);
+                        setEmailModalOpen(true);
+                      }}
                       className="px-6 py-2 bg-white text-black font-bold rounded-xl text-sm hover:bg-orange-500 hover:text-white transition-all"
                     >
                       Responder por E-mail
-                    </a>
+                    </button>
                   </div>
                 </div>
               ))
@@ -1072,6 +1078,18 @@ export default function AdminPanel() {
           </div>
         )}
       </div>
+
+      {/* Email Reply Modal */}
+      {selectedSuggestion && (
+        <EmailReplyModal
+          isOpen={emailModalOpen}
+          onClose={() => {
+            setEmailModalOpen(false);
+            setSelectedSuggestion(null);
+          }}
+          suggestion={selectedSuggestion}
+        />
+      )}
     </div>
   );
 }
