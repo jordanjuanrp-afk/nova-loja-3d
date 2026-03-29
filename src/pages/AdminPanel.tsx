@@ -160,7 +160,7 @@ export default function AdminPanel() {
           isNew: p.is_new,
           isBestSeller: p.is_best_seller,
           videoUrl: p.video_url,
-          images: p.images
+          images: Array.isArray(p.images) ? p.images : []
         }));
         setProducts(mappedData);
       } else {
