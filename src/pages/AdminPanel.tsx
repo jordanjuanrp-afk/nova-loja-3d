@@ -884,11 +884,23 @@ export default function AdminPanel() {
                               {item.color && <div className="text-gray-500 text-xs">Cor: {item.color}</div>}
                             </div>
                             <div className="text-right">
-                              <div className="text-white font-bold">R$ {item.price}</div>
-                              <div className="text-gray-500 text-xs">Qty: {item.quantity || 1}</div>
+                              <div className="text-white font-bold">R$ {(item.price * (item.quantity || 1)).toFixed(2)}</div>
+                              <div className="text-gray-500 text-xs">
+                                {item.quantity || 1}x R$ {Number(item.price).toFixed(2)}
+                              </div>
                             </div>
                           </div>
                         ))}
+                        <div className="border-t border-white/10 pt-3 mt-3">
+                          <div className="flex justify-between items-center">
+                            <span className="text-gray-400 font-bold">Subtotal dos Itens:</span>
+                            <span className="text-white font-black text-lg">
+                              R$ {(typeof order.items === 'string' ? JSON.parse(order.items) : order.items || [])
+                                .reduce((sum: number, item: any) => sum + (item.price * (item.quantity || 1)), 0)
+                                .toFixed(2)}
+                            </span>
+                          </div>
+                        </div>
                       </div>
                     )}
 
