@@ -1,5 +1,5 @@
 import React, { useState, useEffect, FormEvent } from 'react';
-import { Plus, Trash2, Edit2, Save, X, Package, DollarSign, Tag, Layers, Maximize, Palette, Sparkles, AlertCircle, User, Mail, MessageSquare, Image, GripVertical, ShoppingCart, Bell, Check, XCircle, Clock, CheckCircle, ChevronDown, ChevronUp } from 'lucide-react';
+import { Plus, Trash2, Edit2, Save, X, Package, DollarSign, Tag, Layers, Maximize, Palette, Sparkles, AlertCircle, User, Mail, MessageSquare, Image, GripVertical, ShoppingCart, Bell, Check, XCircle, Clock, CheckCircle, ChevronDown, ChevronUp, Zap } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { supabase } from '../lib/supabase';
 import { Product } from '../types';
@@ -129,6 +129,70 @@ export default function AdminPanel() {
       if (error) throw error;
       
       toast.success('Pedido marcado como Pago!');
+      fetchOrders();
+    } catch (error: any) {
+      toast.error('Erro ao atualizar pedido: ' + error.message);
+    }
+  };
+
+  const handleMarkAsSeparating = async (orderId: string) => {
+    try {
+      const { error } = await supabase
+        .from('orders')
+        .update({ status: 'separating' })
+        .eq('id', orderId);
+      
+      if (error) throw error;
+      
+      toast.success('Pedido em separação!');
+      fetchOrders();
+    } catch (error: any) {
+      toast.error('Erro ao atualizar pedido: ' + error.message);
+    }
+  };
+
+  const handleMarkAsInTransit = async (orderId: string) => {
+    try {
+      const { error } = await supabase
+        .from('orders')
+        .update({ status: 'in_transit' })
+        .eq('id', orderId);
+      
+      if (error) throw error;
+      
+      toast.success('Pedido em trânsito!');
+      fetchOrders();
+    } catch (error: any) {
+      toast.error('Erro ao atualizar pedido: ' + error.message);
+    }
+  };
+
+  const handleMarkAsOutForDelivery = async (orderId: string) => {
+    try {
+      const { error } = await supabase
+        .from('orders')
+        .update({ status: 'out_for_delivery' })
+        .eq('id', orderId);
+      
+      if (error) throw error;
+      
+      toast.success('Pedido saiu para entrega!');
+      fetchOrders();
+    } catch (error: any) {
+      toast.error('Erro ao atualizar pedido: ' + error.message);
+    }
+  };
+
+  const handleMarkAsDelivered = async (orderId: string) => {
+    try {
+      const { error } = await supabase
+        .from('orders')
+        .update({ status: 'delivered' })
+        .eq('id', orderId);
+      
+      if (error) throw error;
+      
+      toast.success('Pedido entregue!');
       fetchOrders();
     } catch (error: any) {
       toast.error('Erro ao atualizar pedido: ' + error.message);
@@ -704,6 +768,10 @@ export default function AdminPanel() {
                 const isPending = order.status === 'pending';
                 const isConfirmed = order.status === 'confirmed';
                 const isPaid = order.status === 'paid';
+                const isSeparating = order.status === 'separating';
+                const isInTransit = order.status === 'in_transit';
+                const isOutForDelivery = order.status === 'out_for_delivery';
+                const isDelivered = order.status === 'delivered';
                 
                 return (
                   <div 
@@ -712,6 +780,10 @@ export default function AdminPanel() {
                       "bg-zinc-900 border rounded-[32px] p-8 space-y-4 transition-all",
                       isConfirmed ? "border-blue-500/30" :
                       isPaid ? "border-green-500/30" :
+                      isSeparating ? "border-purple-500/30" :
+                      isInTransit ? "border-orange-500/30" :
+                      isOutForDelivery ? "border-cyan-500/30" :
+                      isDelivered ? "border-green-500/30" :
                       "border-white/10 hover:border-yellow-500/30"
                     )}
                   >
@@ -721,10 +793,18 @@ export default function AdminPanel() {
                           "w-12 h-12 rounded-2xl flex items-center justify-center",
                           isConfirmed ? "bg-blue-500/10 text-blue-400" :
                           isPaid ? "bg-green-500/10 text-green-400" :
+                          isSeparating ? "bg-purple-500/10 text-purple-400" :
+                          isInTransit ? "bg-orange-500/10 text-orange-400" :
+                          isOutForDelivery ? "bg-cyan-500/10 text-cyan-400" :
+                          isDelivered ? "bg-green-500/10 text-green-400" :
                           "bg-yellow-500/10 text-yellow-400"
                         )}>
                           {isConfirmed ? <Clock size={24} /> :
                            isPaid ? <CheckCircle size={24} /> :
+                           isSeparating ? <Package size={24} /> :
+                           isInTransit ? <Zap size={24} /> :
+                           isOutForDelivery ? <ShoppingCart size={24} /> :
+                           isDelivered ? <CheckCircle size={24} /> :
                            <ShoppingCart size={24} />}
                         </div>
                         <div>
@@ -740,11 +820,19 @@ export default function AdminPanel() {
                           isPending ? 'bg-yellow-500/20 text-yellow-400' :
                           isConfirmed ? 'bg-blue-500/20 text-blue-400' :
                           isPaid ? 'bg-green-500/20 text-green-400' :
+                          isSeparating ? 'bg-purple-500/20 text-purple-400' :
+                          isInTransit ? 'bg-orange-500/20 text-orange-400' :
+                          isOutForDelivery ? 'bg-cyan-500/20 text-cyan-400' :
+                          isDelivered ? 'bg-green-500/20 text-green-400' :
                           'bg-gray-500/20 text-gray-400'
                         }`}>
                           {isPending ? 'Pendente' :
                            isConfirmed ? 'Confirmado' :
                            isPaid ? 'Pago' :
+                           isSeparating ? 'Em Separação' :
+                           isInTransit ? 'Em Trânsito' :
+                           isOutForDelivery ? 'Saiu para Entrega' :
+                           isDelivered ? 'Entregue' :
                            order.status}
                         </span>
                         <button
@@ -844,10 +932,86 @@ export default function AdminPanel() {
                     )}
 
                     {isPaid && (
+                      <div className="flex flex-wrap gap-3 pt-4 border-t border-white/5">
+                        <button
+                          onClick={() => handleMarkAsSeparating(order.id)}
+                          className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded-xl transition-all"
+                        >
+                          <Package size={18} />
+                          Em Separação
+                        </button>
+                        <button
+                          onClick={() => handleRejectOrder(order.id)}
+                          className="flex items-center justify-center gap-2 px-6 py-3 bg-red-600/80 hover:bg-red-600 text-white font-bold rounded-xl transition-all"
+                        >
+                          <XCircle size={18} />
+                          Cancelar
+                        </button>
+                      </div>
+                    )}
+
+                    {isSeparating && (
+                      <div className="flex flex-wrap gap-3 pt-4 border-t border-white/5">
+                        <button
+                          onClick={() => handleMarkAsInTransit(order.id)}
+                          className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-orange-600 hover:bg-orange-500 text-white font-bold rounded-xl transition-all"
+                        >
+                          <Zap size={18} />
+                          Em Trânsito
+                        </button>
+                        <button
+                          onClick={() => handleRejectOrder(order.id)}
+                          className="flex items-center justify-center gap-2 px-6 py-3 bg-red-600/80 hover:bg-red-600 text-white font-bold rounded-xl transition-all"
+                        >
+                          <XCircle size={18} />
+                          Cancelar
+                        </button>
+                      </div>
+                    )}
+
+                    {isInTransit && (
+                      <div className="flex flex-wrap gap-3 pt-4 border-t border-white/5">
+                        <button
+                          onClick={() => handleMarkAsOutForDelivery(order.id)}
+                          className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-cyan-600 hover:bg-cyan-500 text-white font-bold rounded-xl transition-all"
+                        >
+                          <ShoppingCart size={18} />
+                          Saiu para Entrega
+                        </button>
+                        <button
+                          onClick={() => handleRejectOrder(order.id)}
+                          className="flex items-center justify-center gap-2 px-6 py-3 bg-red-600/80 hover:bg-red-600 text-white font-bold rounded-xl transition-all"
+                        >
+                          <XCircle size={18} />
+                          Cancelar
+                        </button>
+                      </div>
+                    )}
+
+                    {isOutForDelivery && (
+                      <div className="flex flex-wrap gap-3 pt-4 border-t border-white/5">
+                        <button
+                          onClick={() => handleMarkAsDelivered(order.id)}
+                          className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-green-600 hover:bg-green-500 text-white font-bold rounded-xl transition-all"
+                        >
+                          <CheckCircle size={18} />
+                          Marcar como Entregue
+                        </button>
+                        <button
+                          onClick={() => handleRejectOrder(order.id)}
+                          className="flex items-center justify-center gap-2 px-6 py-3 bg-red-600/80 hover:bg-red-600 text-white font-bold rounded-xl transition-all"
+                        >
+                          <XCircle size={18} />
+                          Cancelar
+                        </button>
+                      </div>
+                    )}
+
+                    {isDelivered && (
                       <div className="pt-4 border-t border-green-500/20">
                         <div className="flex items-center gap-2 text-green-400 font-bold">
                           <CheckCircle size={20} />
-                          Pagamento confirmado - Pedido em produção
+                          Pedido entregue com sucesso!
                         </div>
                       </div>
                     )}
