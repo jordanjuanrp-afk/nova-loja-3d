@@ -895,7 +895,9 @@ export default function AdminPanel() {
                           {(() => {
                             const items = typeof order.items === 'string' ? JSON.parse(order.items) : order.items || [];
                             const subtotal = items.reduce((sum: number, item: any) => sum + (item.price * (item.quantity || 1)), 0);
-                            const shipping = subtotal * 0.1;
+                            const totalQuantity = items.reduce((sum: number, item: any) => sum + (item.quantity || 1), 0);
+                            const hasFreeShipping = totalQuantity >= 3;
+                            const shipping = hasFreeShipping ? 0 : subtotal * 0.1;
                             const total = subtotal + shipping;
                             return (
                               <>
@@ -904,8 +906,16 @@ export default function AdminPanel() {
                                   <span className="text-white font-bold">R$ {subtotal.toFixed(2)}</span>
                                 </div>
                                 <div className="flex justify-between items-center">
-                                  <span className="text-gray-400">Frete (10%):</span>
-                                  <span className="text-white font-bold">R$ {shipping.toFixed(2)}</span>
+                                  <span className="text-gray-400">Quantidade de Itens:</span>
+                                  <span className="text-white font-bold">{totalQuantity} {totalQuantity === 1 ? 'item' : 'itens'}</span>
+                                </div>
+                                <div className="flex justify-between items-center">
+                                  <span className="text-gray-400">Frete:</span>
+                                  {hasFreeShipping ? (
+                                    <span className="text-green-400 font-bold">GRÁTIS (3+ itens)</span>
+                                  ) : (
+                                    <span className="text-white font-bold">R$ {shipping.toFixed(2)}</span>
+                                  )}
                                 </div>
                                 <div className="flex justify-between items-center pt-2 border-t border-white/10">
                                   <span className="text-gray-400 font-black">Total com Frete:</span>
