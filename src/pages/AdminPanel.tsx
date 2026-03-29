@@ -891,15 +891,29 @@ export default function AdminPanel() {
                             </div>
                           </div>
                         ))}
-                        <div className="border-t border-white/10 pt-3 mt-3">
-                          <div className="flex justify-between items-center">
-                            <span className="text-gray-400 font-bold">Subtotal dos Itens:</span>
-                            <span className="text-white font-black text-lg">
-                              R$ {(typeof order.items === 'string' ? JSON.parse(order.items) : order.items || [])
-                                .reduce((sum: number, item: any) => sum + (item.price * (item.quantity || 1)), 0)
-                                .toFixed(2)}
-                            </span>
-                          </div>
+                        <div className="border-t border-white/10 pt-3 mt-3 space-y-2">
+                          {(() => {
+                            const items = typeof order.items === 'string' ? JSON.parse(order.items) : order.items || [];
+                            const subtotal = items.reduce((sum: number, item: any) => sum + (item.price * (item.quantity || 1)), 0);
+                            const shipping = subtotal * 0.1;
+                            const total = subtotal + shipping;
+                            return (
+                              <>
+                                <div className="flex justify-between items-center">
+                                  <span className="text-gray-400">Subtotal dos Itens:</span>
+                                  <span className="text-white font-bold">R$ {subtotal.toFixed(2)}</span>
+                                </div>
+                                <div className="flex justify-between items-center">
+                                  <span className="text-gray-400">Frete (10%):</span>
+                                  <span className="text-white font-bold">R$ {shipping.toFixed(2)}</span>
+                                </div>
+                                <div className="flex justify-between items-center pt-2 border-t border-white/10">
+                                  <span className="text-gray-400 font-black">Total com Frete:</span>
+                                  <span className="text-white font-black text-lg">R$ {total.toFixed(2)}</span>
+                                </div>
+                              </>
+                            );
+                          })()}
                         </div>
                       </div>
                     )}
