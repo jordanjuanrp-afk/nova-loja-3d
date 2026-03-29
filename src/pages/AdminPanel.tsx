@@ -22,7 +22,7 @@ export default function AdminPanel() {
     description: '',
     price: 0,
     category: 'articulado',
-    image: 'https://picsum.photos/seed/toy/800/800',
+    image: '',
     images: [],
     material: 'PLA Premium',
     size: '15cm',
@@ -181,19 +181,22 @@ export default function AdminPanel() {
     try {
       console.log('📦 Salvando produto com imagens:', formData.images);
       
+      const images = formData.images || [];
+      const mainImage = formData.image || (images.length > 0 ? images[0] : '');
+      
       if (editingId) {
         const updateData = {
           name: formData.name,
           description: formData.description,
           price: formData.price,
           category: formData.category,
-          image: formData.image,
+          image: mainImage,
           material: formData.material,
           size: formData.size,
           colors: formData.colors,
           is_new: formData.isNew,
           is_best_seller: formData.isBestSeller,
-          images: formData.images || []
+          images: images
         };
         
         console.log('📤 Enviando para DB:', updateData);
@@ -217,16 +220,15 @@ export default function AdminPanel() {
           description: formData.description!,
           price: formData.price!,
           category: formData.category!,
-          image: formData.image!,
+          image: mainImage,
           material: formData.material!,
           size: formData.size!,
           colors: formData.colors!,
           is_new: formData.isNew ?? true,
           is_best_seller: formData.isBestSeller ?? false,
-          created_at: new Date().toISOString()
+          created_at: new Date().toISOString(),
+          images: images
         };
-        
-        newProduct.images = formData.images || [];
         
         const { error } = await supabase
           .from('products')
@@ -279,7 +281,7 @@ export default function AdminPanel() {
       description: '',
       price: 0,
       category: 'articulado',
-      image: 'https://picsum.photos/seed/toy/800/800',
+      image: '',
       images: [],
       material: 'PLA Premium',
       size: '15cm',
