@@ -182,7 +182,7 @@ export default function AdminPanel() {
       console.log('📦 Salvando produto com imagens:', formData.images);
       
       const images = formData.images || [];
-      const mainImage = formData.image || (images.length > 0 ? images[0] : '');
+      const mainImage = images.length > 0 ? images[0] : (formData.image || '');
       
       if (editingId) {
         const updateData = {
@@ -271,7 +271,10 @@ export default function AdminPanel() {
 
   const startEdit = (product: Product) => {
     setEditingId(product.id);
-    setFormData(product);
+    setFormData({
+      ...product,
+      images: Array.isArray(product.images) ? product.images : []
+    });
     setIsAdding(true);
   };
 
