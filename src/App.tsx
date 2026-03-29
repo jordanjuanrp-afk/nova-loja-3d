@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { Toaster, toast } from 'sonner';
 import Navbar from './components/Navbar';
@@ -15,6 +15,12 @@ import Checkout from './pages/Checkout';
 import Payment from './pages/Payment';
 import { Product, CartItem, User } from './types';
 import { supabase } from './lib/supabase';
+
+function ProtectedRoute({ user, children }: { user: User | null; children: any }) {
+  if (!user) return <Navigate to="/login" replace />;
+  if (user.role !== 'admin') return <Navigate to="/" replace />;
+  return children;
+}
 
 export default function App() {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
@@ -38,7 +44,7 @@ export default function App() {
       try {
         setCartItems(JSON.parse(savedCart));
       } catch (e) {
-        console.error('Error loading cart', e);
+        // error handled silently
       }
     }
   }, []);
@@ -63,7 +69,7 @@ export default function App() {
         });
       }
     }).catch((error) => {
-      console.error('Error getting session:', error);
+      // error handled silently
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -178,9 +184,7 @@ export default function App() {
               />
             } />
             <Route path="/contato" element={<div className="pt-32 text-center h-screen">Contato em breve...</div>} />
-            {user?.role === 'admin' && (
-              <Route path="/admin" element={<AdminPanel />} />
-            )}
+            <Route path="/admin" element={<ProtectedRoute user={user}><AdminPanel /></ProtectedRoute>} />
           </Routes>
         </main>
 

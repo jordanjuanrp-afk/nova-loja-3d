@@ -2,7 +2,6 @@ import { ShoppingCart, User, Search, Menu, X, LogOut } from 'lucide-react';
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
-import { cn } from '../lib/utils';
 import { supabase } from '../lib/supabase';
 import { toast } from 'sonner';
 

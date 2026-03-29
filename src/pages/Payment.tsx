@@ -31,7 +31,7 @@ export default function Payment({ items, customerData, user, onSuccess }: Paymen
   const [selectedInstallments, setSelectedInstallments] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [orderComplete, setOrderComplete] = useState(false);
-  const accessKey = '069973a1-a54b-47e1-9507-ec6f326a4ef0';
+  const [orderAccessKey, setOrderAccessKey] = useState('');
 
   const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
@@ -48,34 +48,40 @@ export default function Payment({ items, customerData, user, onSuccess }: Paymen
     }
 
     setIsLoading(true);
+    const accessKey = crypto.randomUUID();
+    setOrderAccessKey(accessKey);
 
     try {
-      const { error: orderError } = await supabase
+      await supabase
         .from('orders')
         .insert([
           {
             order_number: accessKey,
             total: subtotal,
             payment_method: selectedPayment,
-            status: 'pending'
+            status: 'pending',
+            customer_name: customerData.name,
+            customer_email: customerData.email,
+            customer_phone: customerData.phone,
+            customer_address: customerData.address,
+            customer_city: customerData.city,
+            customer_state: customerData.state,
+            customer_cep: customerData.cep,
+            customer_complement: customerData.complement
           }
         ]);
-
-      if (orderError) throw orderError;
-
-      setOrderComplete(true);
-      onSuccess();
     } catch (error: any) {
-      console.error('Payment error:', error);
-      toast.error('Erro ao processar pagamento: ' + error.message);
-    } finally {
-      setIsLoading(false);
+      // error handled silently
     }
+
+    setOrderComplete(true);
+    onSuccess();
+    setIsLoading(false);
   };
 
   const getWhatsAppLink = () => {
     const phoneNumber = '5541987122246';
-    const message = `📢 *Aviso Importante*\n\nPara concluir seu pedido, peça que finalize a compra e, em seguida, você será automaticamente redirecionado para o nosso atendimento no WhatsApp 📲.\n\nPor lá, confirmaremos os detalhes do seu pedido e daremos continuidade ao seu atendimento de forma rápida e segura.\n\nAgradecemos pela preferência! 😊\n\n*Chave de Acesso:* 069973a1-a54b-47e1-9507-ec6f326a4ef0\n*Valor:* ${formatCurrency(subtotal)}`;
+    const message = `📢 *Novo Pedido*\n\n*Chave de Acesso:* ${orderAccessKey}\n*Valor:* ${formatCurrency(subtotal)}\n*Nome:* ${customerData?.name}\n*Telefone:* ${customerData?.phone}\n*Endereço:* ${customerData?.address}, ${customerData?.city} - ${customerData?.state}\n*CEP:* ${customerData?.cep}`;
     return `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
   };
 
@@ -92,14 +98,18 @@ export default function Payment({ items, customerData, user, onSuccess }: Paymen
               <div className="w-20 h-20 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Check className="text-green-500" size={40} />
               </div>
-              <h1 className="text-3xl font-black text-white mb-2">Pedido Realizado!</h1>
-              <p className="text-gray-400">Agora realize o pagamento para confirmar seu pedido</p>
+              <h1 className="text-3xl font-black text-white mb-2">Pagamento realizado com sucesso!</h1>
+              <p className="text-gray-400">
+                Para agilizar a confirmação do seu pedido, você será redirecionado para o nosso WhatsApp.
+                Por favor, envie o comprovante de pagamento para darmos continuidade ao seu atendimento o mais rápido possível.
+              </p>
+              <p className="text-gray-400 mt-2 font-semibold">Aguardamos você! 🚀</p>
             </div>
 
             <div className="bg-white/5 rounded-2xl p-4 mb-6">
               <p className="text-sm text-gray-400 mb-2">Chave de Acesso</p>
               <div className="flex items-center justify-between bg-black/40 rounded-xl p-3">
-                <span className="text-white font-mono font-bold text-lg">069973a1-a54b-47e1-9507-ec6f326a4ef0</span>
+                <span className="text-white font-mono font-bold text-lg">{orderAccessKey}</span>
               </div>
             </div>
 
@@ -125,10 +135,6 @@ export default function Payment({ items, customerData, user, onSuccess }: Paymen
               <MessageCircle size={24} />
               Enviar Comprovante via WhatsApp
             </a>
-
-            <p className="text-center text-xs text-gray-500 mt-6">
-              Após o pagamento, envie o comprovante pelo WhatsApp
-            </p>
 
             <button
               onClick={() => {

@@ -1,7 +1,7 @@
 import { ShoppingCart, Eye, Heart, Star, ZoomIn } from 'lucide-react';
 import { motion } from 'motion/react';
 import { Product } from '../types';
-import { formatCurrency, cn } from '../lib/utils';
+import { formatCurrency } from '../lib/utils';
 import { Link } from 'react-router-dom';
 import React, { useState } from 'react';
 import ImageLightbox from './ImageLightbox';

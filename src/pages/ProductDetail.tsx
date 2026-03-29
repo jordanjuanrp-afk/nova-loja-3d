@@ -52,7 +52,6 @@ export default function ProductDetail({ onAddToCart }: ProductDetailProps) {
           setMainImageIndex(0);
         }
       } catch (error) {
-        console.error('Error fetching product from Supabase:', error);
         // Fallback to static PRODUCTS
         const found = PRODUCTS.find(p => p.id === id);
         if (found) {

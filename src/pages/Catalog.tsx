@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Search, Filter, SlidersHorizontal, ChevronDown, Sparkles, X } from 'lucide-react';
+import { Search, SlidersHorizontal, ChevronDown, Sparkles, X } from 'lucide-react';
 import ProductCard from '../components/ProductCard';
 import { PRODUCTS } from '../constants';
 import { Product } from '../types';
@@ -28,10 +28,8 @@ export default function Catalog({ onAddToCart }: CatalogProps) {
           .order('created_at', { ascending: false })
           ;
         
-        console.log('Supabase response:', { data, error });
-        
         if (error) {
-          console.error('Supabase error:', error);
+          // error handled silently
         }
         if (data && data.length > 0) {
           const mappedData = data.map(p => ({
@@ -42,7 +40,7 @@ export default function Catalog({ onAddToCart }: CatalogProps) {
           setProducts(mappedData);
         }
       } catch (error) {
-        console.error('Error fetching products from Supabase:', error);
+        // error handled silently
       } finally {
         setIsLoading(false);
       }

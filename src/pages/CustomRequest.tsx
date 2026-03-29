@@ -40,6 +40,7 @@ export default function CustomRequest() {
       }
 
       setIsSuccess(true);
+
       toast.success('Sugestão enviada com sucesso!', {
         description: 'Nossa equipe analisará sua ideia e entrará em contato.'
       });
@@ -51,7 +52,6 @@ export default function CustomRequest() {
       }, 5000);
 
     } catch (error: any) {
-      console.error('Error submitting suggestion:', error);
       toast.error('Erro ao enviar sugestão. Tente novamente mais tarde.');
     } finally {
       setIsSubmitting(false);

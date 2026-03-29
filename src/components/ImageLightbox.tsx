@@ -1,5 +1,6 @@
+
 import React, { useEffect, useCallback } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion } from 'motion/react';
 import { X, ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface ImageLightboxProps {
@@ -58,7 +59,7 @@ const ImageLightbox: React.FC<ImageLightboxProps> = ({
       onClick={onClose}
     >
       <div className="absolute inset-0 bg-black/95 backdrop-blur-md" />
-      
+
       <motion.div
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
@@ -116,11 +117,10 @@ const ImageLightbox: React.FC<ImageLightboxProps> = ({
                 <button
                   key={index}
                   onClick={(e) => { e.stopPropagation(); }}
-                  className={`w-2.5 h-2.5 rounded-full transition-all ${
-                    index === currentIndex 
-                      ? 'bg-white w-8' 
+                  className={`w-2.5 h-2.5 rounded-full transition-all ${index === currentIndex
+                      ? 'bg-white w-8'
                       : 'bg-white/40 hover:bg-white/70'
-                  }`}
+                    }`}
                 />
               ))}
             </div>

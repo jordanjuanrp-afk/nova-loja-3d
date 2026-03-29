@@ -3,7 +3,7 @@ import { motion } from 'motion/react';
 import { ChevronLeft, MapPin, Package, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { formatCurrency } from '../lib/utils';
-import { CartItem, Product } from '../types';
+import { CartItem } from '../types';
 import { toast } from 'sonner';
 
 interface CheckoutProps {

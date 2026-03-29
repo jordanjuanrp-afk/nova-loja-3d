@@ -34,11 +34,16 @@ export default function Footer() {
           <div className="space-y-6">
             <h3 className="text-sm font-black text-white uppercase tracking-widest">Navegação</h3>
             <ul className="space-y-4">
-              {['Início', 'Catálogo', 'Personalizados', 'Sobre Nós', 'Contato'].map((item) => (
-                <li key={item}>
-                  <Link to={`/${item.toLowerCase().replace(' ', '-')}`} className="text-gray-500 hover:text-blue-400 transition-colors flex items-center gap-2 group">
+              {[
+                { label: 'Início', path: '/' },
+                { label: 'Catálogo', path: '/catalogo' },
+                { label: 'Personalizados', path: '/personalizados' },
+                { label: 'Sobre', path: '/sobre' },
+              ].map(({ label, path }) => (
+                <li key={label}>
+                  <Link to={path} className="text-gray-500 hover:text-blue-400 transition-colors flex items-center gap-2 group">
                     <ArrowRight size={14} className="opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all" />
-                    {item}
+                    {label}
                   </Link>
                 </li>
               ))}
@@ -86,9 +91,9 @@ export default function Footer() {
             © {currentYear} ToyVerse 3D - Todos os direitos reservados.
           </p>
           <div className="flex gap-8">
-            <Link to="/privacidade" className="text-gray-600 hover:text-white text-[10px] font-bold uppercase tracking-widest transition-colors">Privacidade</Link>
-            <Link to="/termos" className="text-gray-600 hover:text-white text-[10px] font-bold uppercase tracking-widest transition-colors">Termos de Uso</Link>
-            <Link to="/cookies" className="text-gray-600 hover:text-white text-[10px] font-bold uppercase tracking-widest transition-colors">Cookies</Link>
+            <span className="text-gray-600 text-[10px] font-bold uppercase tracking-widest">Privacidade</span>
+            <span className="text-gray-600 text-[10px] font-bold uppercase tracking-widest">Termos de Uso</span>
+            <span className="text-gray-600 text-[10px] font-bold uppercase tracking-widest">Cookies</span>
           </div>
         </div>
       </div>

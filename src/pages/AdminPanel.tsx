@@ -44,7 +44,6 @@ export default function AdminPanel() {
     const channel = supabase
       .channel('orders-changes')
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'orders' }, (payload) => {
-        console.log('New order:', payload);
         fetchOrders();
         toast.success('Novo pedido recebido!', {
           description: `Pedido #${payload.new.order_number}`
@@ -68,7 +67,7 @@ export default function AdminPanel() {
       if (error && error.code !== '42P01') throw error;
       if (data) setSuggestions(data);
     } catch (error) {
-      console.error('Error fetching suggestions:', error);
+      // error handled silently
     }
   }
 
@@ -82,7 +81,7 @@ export default function AdminPanel() {
       if (error) throw error;
       if (data) setOrders(data);
     } catch (error) {
-      console.error('Error fetching orders:', error);
+      // error handled silently
     }
   }
 
@@ -234,7 +233,6 @@ export default function AdminPanel() {
         setProducts(PRODUCTS);
       }
     } catch (error) {
-      console.error('Error fetching products:', error);
       setProducts(PRODUCTS);
     } finally {
       setIsLoading(false);
@@ -266,19 +264,15 @@ export default function AdminPanel() {
           images: images
         };
         
-        console.log('📤 Enviando para DB:', updateData);
-        
         const { error } = await supabase
           .from('products')
           .update(updateData)
           .eq('id', editingId);
         
         if (error) {
-          console.error('❌ Erro do DB:', error);
           toast.error('Erro ao atualizar: ' + error.message);
           throw error;
         }
-        console.log('✅ Produto atualizado com sucesso!');
         toast.success('Produto atualizado com sucesso!');
       } else {
         const newProduct: any = {
@@ -371,7 +365,6 @@ export default function AdminPanel() {
         ...formData,
         images: newImages
       });
-      console.log('✅ Imagem adicionada ao formulário:', newImages);
       setNewImageUrl('');
     }
   };
@@ -444,17 +437,6 @@ export default function AdminPanel() {
                 Novo Produto
               </button>
             )}
-          </div>
-        </div>
-
-        {/* Info Box */}
-        <div className="mb-12 p-6 bg-blue-500/10 border border-blue-500/20 rounded-3xl flex gap-4 items-start">
-          <AlertCircle className="text-blue-400 shrink-0" size={24} />
-          <div>
-            <h3 className="text-blue-400 font-bold uppercase tracking-widest text-xs mb-1">Acesso Restrito</h3>
-            <p className="text-gray-400 text-sm">
-              Apenas o administrador <span className="text-white font-bold">jordanjuanrp@gmail.com</span> tem permissão para realizar alterações permanentes no banco de dados.
-            </p>
           </div>
         </div>
 

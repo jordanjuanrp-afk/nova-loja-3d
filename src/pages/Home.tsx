@@ -24,10 +24,8 @@ export default function Home({ onAddToCart }: HomeProps) {
           .select('*')
           .order('created_at', { ascending: false });
         
-        console.log('Supabase response:', { data, error });
-        
         if (error) {
-          console.error('Supabase error:', error);
+          // error handled silently
         }
         if (data && data.length > 0) {
           const mappedData = data.map(p => ({
@@ -38,7 +36,7 @@ export default function Home({ onAddToCart }: HomeProps) {
           setProducts(mappedData);
         }
       } catch (error) {
-        console.error('Error fetching products from Supabase:', error);
+        // error handled silently
       } finally {
         setIsLoading(false);
       }

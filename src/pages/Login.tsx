@@ -1,6 +1,6 @@
 import { useState, FormEvent } from 'react';
 import { motion } from 'motion/react';
-import { LogIn, Mail, Lock, Sparkles, AlertCircle, ArrowRight, User } from 'lucide-react';
+import { LogIn, Mail, Lock, Sparkles, ArrowRight, User } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
@@ -60,8 +60,6 @@ export default function Login() {
         }
       }
     } catch (error: any) {
-      console.error('Auth error:', error);
-      
       let errorMessage = 'Erro na autenticação';
       let errorDescription = error.message;
 
