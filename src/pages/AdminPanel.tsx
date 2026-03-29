@@ -222,7 +222,8 @@ export default function AdminPanel() {
           size: formData.size!,
           colors: formData.colors!,
           is_new: formData.isNew ?? true,
-          is_best_seller: formData.isBestSeller ?? false
+          is_best_seller: formData.isBestSeller ?? false,
+          created_at: new Date().toISOString()
         };
         
         newProduct.images = formData.images || [];
