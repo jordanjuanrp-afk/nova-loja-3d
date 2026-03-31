@@ -71,20 +71,20 @@ export default function Hero({ products }: HeroProps) {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid lg:grid-cols-2 gap-12 items-center pl-0 lg:pl-8">
+        <div className="grid lg:grid-cols-[1fr,1fr] gap-8 lg:gap-12 items-center pl-0 lg:pl-8">
           {/* Content */}
           <motion.div
             initial={{ opacity: 0, x: -50 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8 }}
-            className="space-y-8 pl-4 lg:pl-0"
+            className="space-y-8 pl-2 lg:pl-0"
           >
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-full backdrop-blur-md">
               <Sparkles size={16} className="text-blue-400" />
               <span className="text-xs font-bold text-blue-400 uppercase tracking-widest">Tecnologia de Impressão 3D de Ponta</span>
             </div>
             
-            <h1 className="text-6xl lg:text-8xl font-black text-white leading-[0.9] tracking-tighter">
+            <h1 className="text-5xl lg:text-7xl xl:text-8xl font-black text-white leading-[0.9] tracking-tight">
               Transformando <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-purple-400 to-orange-400">Ideias</span> em Diversão Real.
             </h1>
             
@@ -130,7 +130,7 @@ export default function Hero({ products }: HeroProps) {
             initial={{ opacity: 0, scale: 0.8, rotate: 5 }}
             animate={{ opacity: 1, scale: 1, rotate: 0 }}
             transition={{ duration: 1, ease: 'easeOut' }}
-            className="relative flex items-center justify-center"
+            className="relative flex items-center justify-center lg:translate-x-16"
           >
             <div 
               className="relative z-10 w-full aspect-square bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-[40px] border border-white/10 backdrop-blur-3xl p-8 flex items-center justify-center group overflow-hidden"
